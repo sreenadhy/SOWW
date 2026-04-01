@@ -1,0 +1,136 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: min(var(--page-max-width), calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.95rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 24px;
+  background: rgba(252, 248, 241, 0.74);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-soft);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-mark {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff6ea;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  box-shadow: 0 14px 24px rgba(46, 93, 71, 0.22);
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.brand-kicker {
+  margin-bottom: 0.2rem;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  color: var(--muted);
+  font-weight: 700;
+  position: relative;
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.35rem;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--brand));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.site-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.status-chip,
+.cart-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.62rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.status-chip.connected {
+  background: rgba(46, 93, 71, 0.1);
+  color: var(--brand);
+}
+
+.status-chip.muted {
+  background: rgba(97, 117, 107, 0.12);
+  color: var(--muted);
+}
+
+.cart-chip {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--brand-strong);
+  border: 1px solid rgba(46, 93, 71, 0.12);
+}
+
+@media (max-width: 1080px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .site-nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    width: calc(100% - 1rem);
+    padding: 0.95rem 1rem;
+  }
+
+  .header-meta,
+  .site-nav {
+    width: 100%;
+  }
+
+  .header-meta {
+    justify-content: space-between;
+  }
+}
