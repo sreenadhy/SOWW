@@ -1,0 +1,10 @@
+{
+    "/api/orders":  {
+                        "status":  401,
+                        "body":  ""
+                    },
+    "/api/orders/":  {
+                         "status":  500,
+                         "body":  "{\"timestamp\":\"2026-04-01T19:05:52.9399992\",\"status\":500,\"error\":\"Internal Server Error\",\"message\":\"An unexpected error occurred\",\"path\":\"/api/orders/\",\"validationErrors\":null}"
+                     }
+}

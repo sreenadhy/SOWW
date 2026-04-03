@@ -1,0 +1,4 @@
+.session-status-card {
+  display: grid;
+  gap: 1rem;
+}

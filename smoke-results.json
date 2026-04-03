@@ -1,0 +1,65 @@
+{
+    "products":  {
+                     "value":  [
+                                   {
+                                       "id":  1,
+                                       "name":  "Cold Pressed Coconut Oil",
+                                       "description":  "Traditional wood-pressed coconut oil with a clean aroma and smooth finish.",
+                                       "price":  438.00,
+                                       "availableStock":  48,
+                                       "unit":  "1L"
+                                   },
+                                   {
+                                       "id":  2,
+                                       "name":  "Groundnut Cooking Oil",
+                                       "description":  "Rich and flavorful groundnut oil ideal for deep frying and daily cooking.",
+                                       "price":  410.00,
+                                       "availableStock":  45,
+                                       "unit":  "1L"
+                                   },
+                                   {
+                                       "id":  3,
+                                       "name":  "Sesame Gingelly Oil",
+                                       "description":  "Aromatic sesame oil suited for South Indian cooking and seasoning.",
+                                       "price":  482.00,
+                                       "availableStock":  39,
+                                       "unit":  "1L"
+                                   },
+                                   {
+                                       "id":  4,
+                                       "name":  "Sunflower Refined Oil",
+                                       "description":  "Light refined sunflower oil for everyday meals with a neutral taste.",
+                                       "price":  360.00,
+                                       "availableStock":  60,
+                                       "unit":  "1L"
+                                   },
+                                   {
+                                       "id":  5,
+                                       "name":  "Mustard Oil",
+                                       "description":  "Bold mustard oil with a strong profile for marinades and regional dishes.",
+                                       "price":  348.00,
+                                       "availableStock":  35,
+                                       "unit":  "1L"
+                                   }
+                               ],
+                     "Count":  5
+                 },
+    "otp":  {
+                "message":  "OTP generated successfully",
+                "expiresAt":  "2026-04-01T11:22:31.059279300Z",
+                "otp":  "581702"
+            },
+    "verify":  {
+                   "accessToken":  "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5ODc2NTQzMjEwIiwidXNlcklkIjoxLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc1MDQyNDMxLCJleHAiOjE3NzUxMjg4MzF9.WoRRLYXXkupz4qUWxAPnjQu0W1xQ6RkW186OVxFl8vMuWGqGmQQdfNeZhAtfnhia",
+                   "tokenType":  "Bearer",
+                   "expiresAt":  "2026-04-02T11:20:31Z",
+                   "userId":  1,
+                   "phoneNumber":  "9876543210"
+               },
+    "order":  {
+                  "orderId":  "SO-20260401165031-5289",
+                  "subtotal":  1358.00,
+                  "shippingFee":  0.00,
+                  "totalAmount":  1358.00
+              }
+}

@@ -1,0 +1,136 @@
+.login-page {
+  display: grid;
+}
+
+.login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(340px, 0.88fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.login-showcase,
+.login-panel {
+  border-radius: 30px;
+}
+
+.login-showcase h1 {
+  margin: 0;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: 1;
+  max-width: 11ch;
+}
+
+.login-showcase-text {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 55ch;
+}
+
+.login-showcase-art {
+  margin-top: 1.4rem;
+}
+
+.login-showcase-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.login-showcase-grid article {
+  padding: 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(32, 49, 41, 0.08);
+}
+
+.login-showcase-grid strong,
+.login-showcase-grid p {
+  display: block;
+  margin: 0;
+}
+
+.login-showcase-grid strong {
+  margin-bottom: 0.35rem;
+}
+
+.login-showcase-grid p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.login-stage-indicator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.login-stage-pill {
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  background: rgba(46, 93, 71, 0.08);
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.login-stage-pill.active {
+  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  color: #fffaf1;
+}
+
+.login-stage-pill.complete {
+  background: rgba(198, 142, 69, 0.15);
+  color: #8b642a;
+}
+
+.login-stage {
+  display: grid;
+  gap: 1rem;
+  animation: fade-slide-up 220ms ease;
+}
+
+.login-feedback {
+  margin-bottom: 0.9rem;
+}
+
+.login-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1040px) {
+  .login-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .login-showcase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

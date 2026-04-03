@@ -1,0 +1,147 @@
+.hero-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.95fr);
+  gap: 1rem;
+}
+
+.hero-banner-copy,
+.hero-banner-main-art,
+.hero-highlight-card {
+  background: rgba(255, 252, 246, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-banner-copy {
+  border-radius: 30px;
+  padding: 1.8rem;
+}
+
+.hero-banner-copy h1 {
+  margin: 0;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(2.4rem, 4vw, 4.2rem);
+  line-height: 0.98;
+  max-width: 12ch;
+}
+
+.hero-banner-text {
+  margin: 1rem 0 0;
+  max-width: 58ch;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.hero-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.hero-banner-stats {
+  margin-top: 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.hero-banner-stats article {
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(32, 49, 41, 0.08);
+}
+
+.hero-banner-stats span,
+.hero-banner-stats p {
+  display: block;
+  margin: 0;
+  color: var(--muted);
+}
+
+.hero-banner-stats span {
+  font-size: 0.85rem;
+}
+
+.hero-banner-stats strong {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 1.9rem;
+}
+
+.hero-banner-visual {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-banner-main-art {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 30px;
+}
+
+.hero-banner-main-copy {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hero-banner-main-copy h2 {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(1.5rem, 2.3vw, 2rem);
+}
+
+.hero-highlight-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-highlight-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 24px;
+}
+
+.hero-highlight-card h3,
+.hero-highlight-card p {
+  margin: 0;
+}
+
+.hero-highlight-card h3 {
+  margin-bottom: 0.35rem;
+}
+
+.hero-highlight-card p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+@media (max-width: 1080px) {
+  .hero-banner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-banner-copy,
+  .hero-banner-main-art {
+    padding: 1.25rem;
+  }
+
+  .hero-banner-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-highlight-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

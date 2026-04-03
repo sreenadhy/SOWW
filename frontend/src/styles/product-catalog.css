@@ -1,0 +1,40 @@
+.plp-page {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.catalog-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.plp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(32, 49, 41, 0.08);
+  box-shadow: var(--shadow-soft);
+}
+
+.plp-actions p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .plp-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

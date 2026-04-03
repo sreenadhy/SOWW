@@ -1,0 +1,14 @@
+.tagline-strip {
+  display: grid;
+  justify-items: center;
+  padding: 1.2rem 1rem 0.4rem;
+  text-align: center;
+}
+
+.tagline-strip p {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-weight: 800;
+  color: var(--brand-strong);
+  letter-spacing: 0.01em;
+}

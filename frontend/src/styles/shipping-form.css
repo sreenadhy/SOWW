@@ -1,0 +1,25 @@
+.shipping-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.full-span {
+  grid-column: 1 / -1;
+}
+
+.field-error {
+  color: #9f3d2d;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .shipping-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-span {
+    grid-column: auto;
+  }
+}

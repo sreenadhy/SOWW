@@ -1,0 +1,32 @@
+.site-footer {
+  margin-top: auto;
+  background: linear-gradient(180deg, rgba(15, 38, 28, 0.96), rgba(10, 27, 20, 1));
+  color: rgba(247, 243, 236, 0.92);
+}
+
+.footer-content {
+  width: min(1240px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.4rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer-content strong {
+  font-size: 1rem;
+}
+
+.footer-content span {
+  color: rgba(247, 243, 236, 0.72);
+}
+
+@media (max-width: 640px) {
+  .footer-content {
+    width: calc(100% - 1rem);
+    padding: 1.1rem 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

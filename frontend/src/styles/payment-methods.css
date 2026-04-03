@@ -1,0 +1,35 @@
+.payment-method-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.payment-options {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.payment-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(32, 49, 41, 0.08);
+}
+
+.payment-option input {
+  margin-top: 0.28rem;
+}
+
+.payment-option strong,
+.payment-option p {
+  margin: 0;
+}
+
+.payment-option p {
+  margin-top: 0.3rem;
+  color: var(--muted);
+  line-height: 1.6;
+}

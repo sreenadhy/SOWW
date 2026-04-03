@@ -1,0 +1,123 @@
+.site-header {
+  width: min(1240px, calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 252, 247, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-soft);
+}
+
+.site-header--with-search {
+  display: grid;
+  grid-template-columns: auto minmax(280px, 1fr) auto;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-mark {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff7ee;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  box-shadow: 0 14px 24px rgba(46, 93, 71, 0.2);
+}
+
+.brand-name {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.brand-kicker {
+  margin: 0 0 0.18rem;
+}
+
+.header-search {
+  width: min(100%, 560px);
+  justify-self: center;
+}
+
+.header-search input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(32, 49, 41, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.92rem 1rem;
+  color: var(--text);
+  outline: none;
+}
+
+.header-search input:focus {
+  border-color: rgba(46, 93, 71, 0.42);
+  box-shadow: 0 0 0 4px rgba(46, 93, 71, 0.08);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.session-pill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.72rem 0.95rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(32, 49, 41, 0.08);
+  box-shadow: var(--shadow-soft);
+}
+
+.session-pill strong {
+  font-size: 0.94rem;
+}
+
+.session-pill-label {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    width: calc(100% - 1rem);
+    padding: 0.9rem 1rem;
+  }
+
+  .site-header--with-search {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    order: 3;
+  }
+
+  .header-actions {
+    justify-content: flex-end;
+  }
+
+  .session-pill {
+    display: none;
+  }
+}

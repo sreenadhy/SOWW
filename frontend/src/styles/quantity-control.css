@@ -1,0 +1,26 @@
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 248, 238, 0.9);
+  border: 1px solid rgba(198, 142, 69, 0.14);
+}
+
+.qty-controls button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 0;
+  background: white;
+  color: var(--brand-strong);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.qty-controls span {
+  min-width: 1.2rem;
+  text-align: center;
+  font-weight: 800;
+}
