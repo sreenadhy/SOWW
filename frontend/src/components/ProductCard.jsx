@@ -1,4 +1,3 @@
-import ProductArtwork from './ProductArtwork';
 import QuantityControl from './QuantityControl';
 import '../styles/product-card.css';
 
@@ -8,7 +7,11 @@ export default function ProductCard({ product, quantity, onUpdateCart, formatCur
   return (
     <article className="product-card">
       <div className="product-card-media">
-        <ProductArtwork name={product.name} emphasis="card" />
+          <img
+              src={product.image}
+              alt={product.name}
+              className="product-image"
+          />
       </div>
 
       <div className="product-card-top">

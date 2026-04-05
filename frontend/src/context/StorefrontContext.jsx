@@ -30,6 +30,10 @@ import {
   formatCurrency,
   validateShippingForm,
 } from '../utils/storefront';
+import coconutImg from '../assets/Cco.png';
+import sunflowerImg from '../assets/All.png';
+import castorImg from '../assets/Castor_Oil.png';
+import groundnutImg from '../assets/Groundnut_Oil.png';
 
 const StorefrontContext = createContext(null);
 
@@ -164,7 +168,16 @@ export function StorefrontProvider({ children }) {
 
     try {
       const data = await fetchProducts();
-      setProducts(Array.isArray(data) ? data : []);
+      const productsWithImages = (Array.isArray(data) ? data : []).map((product) => {
+        const name = product.name.toLowerCase();
+        let image = '';
+        if (name.includes('coconut')) image = coconutImg;
+        else if (name.includes('sunflower')) image = sunflowerImg;
+        else if (name.includes('castor')) image = castorImg;
+        else if (name.includes('groundnut')) image = groundnutImg;
+        return { ...product, image };
+      });
+      setProducts(productsWithImages);
     } catch (error) {
       setProductsError(error.message || 'Unable to load products right now.');
     } finally {
