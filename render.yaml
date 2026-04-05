@@ -23,10 +23,6 @@ services:
     envVars:
       - key: PORT
         value: "10000"
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: sritha-oils-db
-          property: connectionString
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: sritha-oils-db
