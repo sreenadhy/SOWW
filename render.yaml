@@ -3,7 +3,6 @@ services:
     name: sritha-oils-frontend
     runtime: static
     rootDir: frontend
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./frontend/dist
     routes:
