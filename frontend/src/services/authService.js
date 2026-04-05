@@ -10,10 +10,17 @@ export function requestOtpCode(phoneNumber) {
   });
 }
 
-export async function verifyOtpCode(phoneNumber, otp) {
-  const response = await request('/api/auth/verify-otp', {
+export function verifyOtpCode(phoneNumber, otp) {
+  return request('/api/auth/verify-otp', {
     method: 'POST',
     body: JSON.stringify({ phoneNumber, otp }),
+  });
+}
+
+export async function registerAccount(payload) {
+  const response = await request('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   });
 
   return normalizeAuthSession(response);

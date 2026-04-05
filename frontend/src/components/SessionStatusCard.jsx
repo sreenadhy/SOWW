@@ -13,8 +13,11 @@ export default function SessionStatusCard({ authState, onLogout }) {
       <div className="auth-success-card">
         <span className="success-dot" />
         <div>
-          <p className="callout-title">OTP verified</p>
-          <p>{authState?.phoneNumber} is active for protected checkout and payment steps.</p>
+          <p className="callout-title">Authenticated shopper</p>
+          <p>
+            Signed in as {authState?.name || authState?.phoneNumber}. Protected checkout and
+            order APIs are active.
+          </p>
         </div>
         <button type="button" className="text-button" onClick={onLogout}>
           Log out

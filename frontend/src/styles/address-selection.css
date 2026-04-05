@@ -1,0 +1,20 @@
+.stacked-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.selection-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(32, 49, 41, 0.08);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.selection-card p,
+.selection-card strong {
+  margin: 0;
+}

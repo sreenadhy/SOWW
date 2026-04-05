@@ -2,7 +2,7 @@ import '../styles/shipping-form.css';
 
 const fieldConfig = [
   { name: 'fullName', label: 'Full name', placeholder: 'Sritha Customer' },
-  { name: 'phoneNumber', label: 'Phone number', placeholder: '9876543210' },
+  { name: 'phoneNumber', label: 'Phone number', placeholder: 'Enter mobile number' },
   {
     name: 'addressLine1',
     label: 'Address line 1',

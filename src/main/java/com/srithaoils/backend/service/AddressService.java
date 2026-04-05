@@ -2,6 +2,7 @@ package com.srithaoils.backend.service;
 
 import com.srithaoils.backend.dto.address.AddressResponse;
 import com.srithaoils.backend.dto.address.CreateAddressRequest;
+import com.srithaoils.backend.dto.address.UpdateAddressRequest;
 import com.srithaoils.backend.entity.Address;
 import com.srithaoils.backend.entity.User;
 import com.srithaoils.backend.exception.ResourceNotFoundException;
@@ -56,6 +57,32 @@ public class AddressService {
                 .stream()
                 .map(this::mapAddress)
                 .toList();
+    }
+
+    @Transactional
+    public AddressResponse updateAddress(String primaryPhoneNumber, Long addressId, UpdateAddressRequest request) {
+        User user = userRepository.findByPrimaryPhoneNumber(primaryPhoneNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+
+        Address address = addressRepository.findByIdAndUserId(addressId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found for this user"));
+
+        List<Address> existingAddresses = addressRepository.findAllByUserIdOrderByIsDefaultDescCreatedAtDesc(user.getId());
+        boolean shouldBeDefault = Boolean.TRUE.equals(request.isDefault());
+
+        if (shouldBeDefault) {
+            existingAddresses.stream()
+                    .filter(existingAddress -> !existingAddress.getId().equals(address.getId()))
+                    .forEach(existingAddress -> existingAddress.setIsDefault(Boolean.FALSE));
+        }
+
+        address.setFullAddress(request.fullAddress().trim());
+        address.setCity(request.city().trim());
+        address.setState(request.state().trim());
+        address.setPincode(request.pincode().trim());
+        address.setIsDefault(shouldBeDefault || Boolean.TRUE.equals(address.getIsDefault()));
+
+        return mapAddress(addressRepository.save(address));
     }
 
     private AddressResponse mapAddress(Address address) {

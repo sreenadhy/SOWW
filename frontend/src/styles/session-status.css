@@ -2,3 +2,39 @@
   display: grid;
   gap: 1rem;
 }
+
+.auth-success-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.9rem;
+  padding: 1rem 1.05rem;
+  border-radius: 20px;
+  background: rgba(51, 116, 77, 0.09);
+  border: 1px solid rgba(51, 116, 77, 0.14);
+}
+
+.success-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f9f73, #2e5d47);
+  box-shadow: 0 0 0 5px rgba(79, 159, 115, 0.12);
+}
+
+.auth-success-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .auth-success-card {
+    grid-template-columns: 1fr;
+  }
+
+  .success-dot {
+    display: none;
+  }
+}

@@ -16,15 +16,15 @@ function formatDate(value) {
 }
 
 function formatPaymentLabel(paymentMethod) {
-  if (paymentMethod === 'card') {
-    return 'Card';
-  }
-
   if (paymentMethod === 'cod') {
     return 'Cash on Delivery';
   }
 
-  return 'UPI';
+  if (paymentMethod === 'COD') {
+    return 'Cash on Delivery';
+  }
+
+  return 'Online Payment';
 }
 
 export default function OrderConfirmationPage() {
@@ -78,11 +78,15 @@ export default function OrderConfirmationPage() {
             </div>
             <div>
               <span>Payment</span>
-              <strong>{formatPaymentLabel(lastOrder.paymentMethod)}</strong>
+              <strong>{formatPaymentLabel(lastOrder.payment?.paymentMethod || lastOrder.paymentMethod)}</strong>
             </div>
             <div>
               <span>Total amount</span>
               <strong>{formatCurrency(lastOrder.totalAmount)}</strong>
+            </div>
+            <div>
+              <span>Estimated delivery</span>
+              <strong>{lastOrder.estimatedDeliveryDate || 'Within 4 days'}</strong>
             </div>
           </div>
 

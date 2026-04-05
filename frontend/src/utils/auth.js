@@ -49,6 +49,8 @@ export function normalizeAuthSession(payload) {
     expiresAt: payload.expiresAt || getTokenExpiration(payload.accessToken),
     userId: payload.userId ?? null,
     phoneNumber: payload.phoneNumber || '',
+    name: payload.name || '',
+    email: payload.email || '',
     verifiedAt: payload.verifiedAt || new Date().toISOString(),
   };
 }
@@ -87,7 +89,10 @@ export function shouldAttemptRefresh(session) {
 }
 
 export function normalizePhoneNumber(phoneNumber = '') {
-  return String(phoneNumber).replace(/\D/g, '').slice(0, PHONE_NUMBER_LENGTH);
+  const digits = String(phoneNumber).replace(/\D/g, '');
+  return digits.length <= PHONE_NUMBER_LENGTH
+    ? digits
+    : digits.slice(-PHONE_NUMBER_LENGTH);
 }
 
 export function isValidPhoneNumber(phoneNumber = '') {

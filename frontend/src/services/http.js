@@ -41,7 +41,13 @@ export async function request(endpoint, options = {}) {
   const data = rawBody ? tryParseJson(rawBody) : null;
 
   if (!response.ok) {
+    const validationMessage =
+      data?.validationErrors && typeof data.validationErrors === 'object'
+        ? Object.values(data.validationErrors).find(Boolean)
+        : null;
+
     const message =
+      validationMessage ||
       data?.message ||
       data?.error ||
       (rawBody && typeof data === 'string' ? data : null) ||

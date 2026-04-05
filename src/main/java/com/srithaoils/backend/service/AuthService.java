@@ -5,7 +5,6 @@ import com.srithaoils.backend.dto.auth.OtpRequestRequest;
 import com.srithaoils.backend.dto.auth.OtpRequestResponse;
 import com.srithaoils.backend.dto.auth.OtpVerifyRequest;
 import com.srithaoils.backend.dto.auth.RegisterRequest;
-import com.srithaoils.backend.dto.auth.RegisterResponse;
 import com.srithaoils.backend.entity.User;
 import com.srithaoils.backend.repository.UserRepository;
 import com.srithaoils.backend.security.JwtService;
@@ -39,7 +38,7 @@ public class AuthService {
     }
 
     @Transactional
-    public RegisterResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByPrimaryPhoneNumber(request.primaryPhoneNumber())) {
             throw new IllegalArgumentException("A user already exists with this primary phone number");
         }
@@ -47,17 +46,22 @@ public class AuthService {
         User user = new User(
                 request.primaryPhoneNumber(),
                 request.secondaryPhoneNumber(),
-                request.name().trim()
+                request.name().trim(),
+                request.email() == null ? null : request.email().trim()
         );
 
         User savedUser = userRepository.save(user);
+        String token = jwtService.generateToken(savedUser);
 
-        return new RegisterResponse(
+        return new AuthResponse(
+                token,
+                "Bearer",
+                jwtService.extractExpiration(token),
                 savedUser.getId(),
                 savedUser.getPrimaryPhoneNumber(),
-                savedUser.getSecondaryPhoneNumber(),
+                true,
                 savedUser.getName(),
-                savedUser.getCreatedAt()
+                savedUser.getEmail()
         );
     }
 
@@ -88,6 +92,7 @@ public class AuthService {
                     null,
                     request.phoneNumber(),
                     false,
+                    null,
                     null
             );
         }
@@ -102,7 +107,8 @@ public class AuthService {
                 user.getId(),
                 user.getPrimaryPhoneNumber(),
                 true,
-                user.getName()
+                user.getName(),
+                user.getEmail()
         );
     }
 }

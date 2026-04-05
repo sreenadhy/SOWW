@@ -7,6 +7,7 @@ public record RegisterResponse(
         String primaryPhoneNumber,
         String secondaryPhoneNumber,
         String name,
+        String email,
         LocalDateTime createdAt
 ) {
 }

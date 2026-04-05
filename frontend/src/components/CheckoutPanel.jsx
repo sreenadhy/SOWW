@@ -68,7 +68,7 @@ export default function CheckoutPanel({
             name="phoneNumber"
             value={shippingForm.phoneNumber}
             onChange={onShippingChange}
-            placeholder="9876543210"
+            placeholder="Enter mobile number"
           />
         </label>
         <label className="field-group full-span">

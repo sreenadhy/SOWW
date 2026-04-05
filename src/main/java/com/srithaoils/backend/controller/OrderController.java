@@ -4,6 +4,7 @@ import com.srithaoils.backend.dto.order.CreateOrderRequest;
 import com.srithaoils.backend.dto.order.CreateOrderResponse;
 import com.srithaoils.backend.dto.order.OrderSummaryResponse;
 import com.srithaoils.backend.dto.order.OrderTrackingResponse;
+import com.srithaoils.backend.dto.order.UpdateOrderStatusRequest;
 import com.srithaoils.backend.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +49,13 @@ public class OrderController {
             Authentication authentication,
             @PathVariable Long orderId) {
         return orderService.getOrderTracking(authenticatedPhone(authentication), orderId);
+    }
+
+    @PatchMapping("/{orderId}/status")
+    public OrderSummaryResponse updateOrderStatus(
+            @PathVariable Long orderId,
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
+        return orderService.updateOrderStatus(orderId, request);
     }
 
     private String authenticatedPhone(Authentication authentication) {

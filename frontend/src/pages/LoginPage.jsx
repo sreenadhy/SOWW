@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import ProductArtwork from '../components/ProductArtwork';
+import { useEffect, useMemo, useState } from 'react';
+import InlineSpinner from '../components/InlineSpinner';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import OtpInputField from '../components/OtpInputField';
+import PhoneNumberField from '../components/PhoneNumberField';
+import organicOilsPoster from '../assets/organic-oils-poster.svg';
 import useStorefront from '../hooks/useStorefront';
 import { isValidOtp, isValidPhoneNumber, normalizeOtp, normalizePhoneNumber } from '../utils/auth';
 import { ROUTES } from '../utils/routes';
@@ -39,16 +42,18 @@ function StageIndicator({ activeStage }) {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     authStage,
     authPhoneNumber,
-    authOtpHint,
     authLoading,
     authError,
-    demoExistingUser,
-    demoOtp,
+    authMessage,
+    authDevOtp,
+    authCooldownEndsAt,
     isAuthenticated,
     requestOtp,
+    resendOtp,
     verifyOtp,
     registerUser,
     resetAuthFlow,
@@ -57,6 +62,8 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [now, setNow] = useState(Date.now());
+  const redirectPath = location.state?.from || ROUTES.home;
 
   useEffect(() => {
     if (authPhoneNumber) {
@@ -66,9 +73,28 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(ROUTES.home, { replace: true });
+      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, redirectPath]);
+
+  useEffect(() => {
+    if (!authCooldownEndsAt || authCooldownEndsAt <= Date.now()) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [authCooldownEndsAt]);
+
+  const resendSeconds = useMemo(
+    () => Math.max(0, Math.ceil((authCooldownEndsAt - now) / 1000)),
+    [authCooldownEndsAt, now],
+  );
 
   async function handleRequestOtp(event) {
     event.preventDefault();
@@ -90,7 +116,7 @@ export default function LoginPage() {
       const result = await verifyOtp(normalizedValue);
 
       if (result.status === 'existing') {
-        navigate(ROUTES.home, { replace: true });
+        navigate(redirectPath, { replace: true });
       }
     } catch {}
   }
@@ -100,16 +126,22 @@ export default function LoginPage() {
 
     try {
       await registerUser({ name, email });
-      navigate(ROUTES.home, { replace: true });
+      navigate(redirectPath, { replace: true });
     } catch {}
   }
 
-  function handleStartOver() {
-    resetAuthFlow();
+  async function handleStartOver() {
+    await resetAuthFlow();
     setPhoneNumber('');
     setOtp('');
     setName('');
     setEmail('');
+  }
+
+  async function handleResendOtp() {
+    try {
+      await resendOtp();
+    } catch {}
   }
 
   return (
@@ -117,29 +149,19 @@ export default function LoginPage() {
       <div className="login-layout">
         <aside className="login-showcase panel-card">
           <p className="eyebrow">Simple account flow</p>
-          <h1>Login with OTP and continue shopping without leaving the storefront.</h1>
+          <h1 className="login-showcase-title">
+            <span>Login with OTP and continue shopping</span>
+          </h1>
           <p className="login-showcase-text">
-            This screen uses a mocked phone login flow so we can polish the experience
-            first and plug in the real backend later.
+            Secure mobile verification with a clean sign-in flow.
           </p>
 
           <div className="login-showcase-art">
-            <ProductArtwork variant="sunflower" emphasis="hero" />
-          </div>
-
-          <div className="login-showcase-grid">
-            <article>
-              <strong>Existing user demo</strong>
-              <p>{demoExistingUser.phoneNumber}</p>
-            </article>
-            <article>
-              <strong>Demo OTP</strong>
-              <p>{demoOtp}</p>
-            </article>
-            <article>
-              <strong>New user demo</strong>
-              <p>Use any other valid 10-digit number</p>
-            </article>
+            <img
+              className="login-showcase-image"
+              src={organicOilsPoster}
+              alt="Organic oil bottles with natural ingredients"
+            />
           </div>
         </aside>
 
@@ -147,7 +169,7 @@ export default function LoginPage() {
           <div className="panel-heading">
             <div>
               <p className="section-kicker">Secure access</p>
-              <h2>Continue with your phone number</h2>
+              <h2>Continue with your mobile number</h2>
             </div>
             <Link className="secondary-button compact" to={ROUTES.home}>
               Back to home
@@ -155,6 +177,12 @@ export default function LoginPage() {
           </div>
 
           <StageIndicator activeStage={authStage} />
+
+          {authMessage && authStage !== 'otp' ? (
+            <p className="login-feedback login-feedback-success login-feedback-inline" role="status">
+              {authMessage}
+            </p>
+          ) : null}
 
           {authError ? (
             <p className="form-error login-feedback" role="alert">
@@ -164,79 +192,93 @@ export default function LoginPage() {
 
           {authStage === 'phone' ? (
             <form className="login-stage" onSubmit={handleRequestOtp}>
-              <label className="field-group">
-                <span>Phone number</span>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel"
-                  placeholder="Enter your 10-digit phone number"
-                  value={phoneNumber}
-                  onChange={(event) => setPhoneNumber(normalizePhoneNumber(event.target.value))}
-                  disabled={authLoading}
-                />
-              </label>
+              <PhoneNumberField
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(normalizePhoneNumber(event.target.value))}
+                disabled={authLoading}
+              />
 
-              <div className="info-callout">
-                <p className="callout-title">Demo flow</p>
-                <p>
-                  Use <strong>{demoExistingUser.phoneNumber}</strong> for an existing
-                  user, or any other 10-digit number to open the create-account step.
-                </p>
-              </div>
+              <p className="login-support-text">
+                Enter your 10-digit mobile number to receive an OTP by SMS.
+              </p>
 
               <button
                 type="submit"
                 className="primary-button panel-button"
                 disabled={authLoading || !isValidPhoneNumber(phoneNumber)}
               >
-                {authLoading ? 'Requesting OTP...' : 'Request OTP'}
+                {authLoading ? (
+                  <>
+                    <InlineSpinner />
+                    Sending OTP...
+                  </>
+                ) : (
+                  'Request OTP'
+                )}
               </button>
             </form>
           ) : null}
 
           {authStage === 'otp' ? (
             <form className="login-stage" onSubmit={handleVerifyOtp}>
-              <div className="state-card compact">
-                OTP sent to <strong>{authPhoneNumber}</strong>. Use{' '}
-                <strong>{authOtpHint || demoOtp}</strong> to continue.
-              </div>
+              <p className="login-feedback login-feedback-success login-feedback-inline login-otp-note" role="status">
+                {authMessage || 'OTP generated successfully.'} OTP sent to <strong>{authPhoneNumber}</strong>. Enter the 6-digit code.
+              </p>
 
-              <label className="field-group">
-                <span>OTP</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  placeholder="Enter 6-digit OTP"
-                  value={otp}
-                  onChange={(event) => setOtp(normalizeOtp(event.target.value))}
-                  disabled={authLoading}
-                />
-              </label>
+              {authDevOtp ? (
+                <div className="info-callout login-dev-otp">
+                  <p className="callout-title">Development OTP</p>
+                  <p>
+                    SMS is not connected in this backend mode. Use <strong>{authDevOtp}</strong>{' '}
+                    to continue.
+                  </p>
+                </div>
+              ) : null}
 
-              <div className="login-action-row">
+              <OtpInputField
+                value={otp}
+                onChange={(event) => setOtp(normalizeOtp(event.target.value))}
+                disabled={authLoading}
+              />
+
+              <div className="login-resend-row">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={handleResendOtp}
+                  disabled={authLoading || resendSeconds > 0}
+                >
+                  {resendSeconds > 0 ? `Resend OTP in ${resendSeconds}s` : 'Resend OTP'}
+                </button>
                 <button type="button" className="text-button" onClick={handleStartOver}>
                   Use another number
                 </button>
-                <button
-                  type="submit"
-                  className="primary-button"
-                  disabled={authLoading || !isValidOtp(otp)}
-                >
-                  {authLoading ? 'Verifying...' : 'Verify OTP'}
-                </button>
               </div>
+
+              <button
+                type="submit"
+                className="primary-button panel-button"
+                disabled={authLoading || !isValidOtp(otp)}
+              >
+                {authLoading ? (
+                  <>
+                    <InlineSpinner />
+                    Verifying OTP...
+                  </>
+                ) : (
+                  'Verify OTP'
+                )}
+              </button>
             </form>
           ) : null}
 
           {authStage === 'register' ? (
             <form className="login-stage" onSubmit={handleRegister}>
               <div className="state-card compact success-panel">
-                <p className="callout-title">Phone verified</p>
+                <p className="callout-title">Create your account</p>
                 <p>
-                  We didn&apos;t find an account for <strong>{authPhoneNumber}</strong>.
-                  Create one now to continue.
+                  We verified <strong>{authPhoneNumber}</strong>. Complete your profile to
+                  continue.
                 </p>
               </div>
 
@@ -252,11 +294,11 @@ export default function LoginPage() {
               </label>
 
               <label className="field-group">
-                <span>Email (optional)</span>
+                <span>Email</span>
                 <input
                   type="email"
                   autoComplete="email"
-                  placeholder="Enter your email"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   disabled={authLoading}
@@ -272,11 +314,19 @@ export default function LoginPage() {
                   className="primary-button"
                   disabled={authLoading || !name.trim()}
                 >
-                  {authLoading ? 'Creating account...' : 'Create account'}
+                  {authLoading ? (
+                    <>
+                      <InlineSpinner />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
                 </button>
               </div>
             </form>
           ) : null}
+
         </div>
       </div>
     </section>

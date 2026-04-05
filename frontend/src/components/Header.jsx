@@ -6,7 +6,8 @@ import '../styles/header.css';
 export default function Header({ cartCount, currentUser, isAuthenticated, onLogout }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isHomePage = location.pathname === ROUTES.home;
+  const isHomePage =
+    location.pathname === ROUTES.home || location.pathname === ROUTES.products;
   const searchValue = isHomePage ? searchParams.get('q') || '' : '';
 
   function handleSearchChange(event) {
@@ -47,9 +48,12 @@ export default function Header({ cartCount, currentUser, isAuthenticated, onLogo
         {isAuthenticated ? (
           <>
             <div className="session-pill">
-              <span className="session-pill-label">Signed in</span>
+              <span className="session-pill-label">Signed in as</span>
               <strong>{currentUser?.name || currentUser?.phoneNumber}</strong>
             </div>
+            <Link className="secondary-button compact" to={ROUTES.profile}>
+              My Profile
+            </Link>
             <button type="button" className="secondary-button compact" onClick={onLogout}>
               Logout
             </button>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import organicOilsPoster from '../assets/organic-oils-poster.svg';
 import { ROUTES } from '../utils/routes';
 import '../styles/splash-page.css';
 
@@ -17,7 +18,12 @@ export default function SplashPage() {
   }, [navigate]);
 
   return (
-    <main className="splash-shell">
+    <main
+      className="splash-shell"
+      style={{
+        '--splash-image': `url(${organicOilsPoster})`,
+      }}
+    >
       <div className="splash-panel">
         <div className="splash-mark">SO</div>
         <p className="eyebrow">Launching Storefront</p>

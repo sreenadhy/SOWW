@@ -2,13 +2,16 @@ package com.srithaoils.backend.controller;
 
 import com.srithaoils.backend.dto.address.AddressResponse;
 import com.srithaoils.backend.dto.address.CreateAddressRequest;
+import com.srithaoils.backend.dto.address.UpdateAddressRequest;
 import com.srithaoils.backend.service.AddressService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,6 +40,14 @@ public class AddressController {
     @GetMapping
     public List<AddressResponse> getAddresses(Authentication authentication) {
         return addressService.getAddresses(authenticatedPhone(authentication));
+    }
+
+    @PutMapping("/{addressId}")
+    public AddressResponse updateAddress(
+            Authentication authentication,
+            @PathVariable Long addressId,
+            @Valid @RequestBody UpdateAddressRequest request) {
+        return addressService.updateAddress(authenticatedPhone(authentication), addressId, request);
     }
 
     private String authenticatedPhone(Authentication authentication) {

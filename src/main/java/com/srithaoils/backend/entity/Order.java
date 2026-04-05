@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -45,6 +46,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderTracking> trackingUpdates = new ArrayList<>();
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Payment payment;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 
@@ -76,6 +80,13 @@ public class Order {
     public void addTrackingUpdate(OrderTracking trackingUpdate) {
         trackingUpdates.add(trackingUpdate);
         trackingUpdate.setOrder(this);
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+        if (payment != null) {
+            payment.setOrder(this);
+        }
     }
 
     public Long getId() {
@@ -124,6 +135,10 @@ public class Order {
 
     public void setTrackingUpdates(List<OrderTracking> trackingUpdates) {
         this.trackingUpdates = trackingUpdates;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     public BigDecimal getSubtotal() {

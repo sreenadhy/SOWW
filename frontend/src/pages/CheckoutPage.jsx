@@ -1,7 +1,9 @@
+import AddressSelectionCard from '../components/AddressSelectionCard';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OrderSummaryCard from '../components/OrderSummaryCard';
 import PageIntro from '../components/PageIntro';
+import PaymentMethodSelector from '../components/PaymentMethodSelector';
 import ShippingForm from '../components/ShippingForm';
 import useStorefront from '../hooks/useStorefront';
 import { ROUTES } from '../utils/routes';
@@ -12,16 +14,23 @@ export default function CheckoutPage() {
   const [shippingErrors, setShippingErrors] = useState({});
   const {
     cartItems,
+    addresses,
     shippingForm,
     subtotal,
     shippingFee,
     total,
+    selectedAddressId,
+    useSavedAddress,
     updateShippingValue,
+    selectAddress,
+    startNewAddress,
     formatCurrency,
+    paymentMethod,
+    setPaymentMethod,
   } = useStorefront();
 
   function handleContinue() {
-    const nextErrors = validateShippingForm(shippingForm);
+    const nextErrors = useSavedAddress ? {} : validateShippingForm(shippingForm);
     setShippingErrors(nextErrors);
 
     if (Object.keys(nextErrors).length === 0) {
@@ -48,26 +57,38 @@ export default function CheckoutPage() {
       />
 
       <section className="page-split">
-        <section className="panel-card checkout-form-card">
-          <div className="panel-heading">
-            <div>
-              <p className="section-kicker">Shipping</p>
-              <h2>Delivery address</h2>
-            </div>
-          </div>
+        <div className="payment-main-stack">
+          <AddressSelectionCard
+            addresses={addresses}
+            selectedAddressId={selectedAddressId}
+            useSavedAddress={useSavedAddress}
+            onSelectAddress={selectAddress}
+            onAddNew={startNewAddress}
+          />
 
-          {cartItems.length === 0 ? (
-            <div className="state-card">
-              Your cart is empty. Add products before filling out checkout details.
+          <section className="panel-card checkout-form-card">
+            <div className="panel-heading">
+              <div>
+                <p className="section-kicker">Shipping</p>
+                <h2>{useSavedAddress ? 'Selected address' : 'Add new address'}</h2>
+              </div>
             </div>
-          ) : (
-            <ShippingForm
-              shippingForm={shippingForm}
-              errors={shippingErrors}
-              onChange={updateShippingValue}
-            />
-          )}
-        </section>
+
+            {cartItems.length === 0 ? (
+              <div className="state-card">
+                Your cart is empty. Add products before filling out checkout details.
+              </div>
+            ) : (
+              <ShippingForm
+                shippingForm={shippingForm}
+                errors={shippingErrors}
+                onChange={updateShippingValue}
+              />
+            )}
+          </section>
+
+          <PaymentMethodSelector paymentMethod={paymentMethod} onChange={setPaymentMethod} />
+        </div>
 
         <OrderSummaryCard
           title="Checkout summary"
@@ -84,7 +105,7 @@ export default function CheckoutPage() {
                 onClick={handleContinue}
                 disabled={cartItems.length === 0}
               >
-                Save and continue
+                Continue to review
               </button>
               <Link className="secondary-button panel-button" to={ROUTES.cart}>
                 Return to cart

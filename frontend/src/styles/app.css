@@ -11,9 +11,135 @@
   padding: 1.4rem 0 2.5rem;
 }
 
+.page-intro,
+.page-split,
+.payment-layout,
+.payment-main-stack,
+.side-panel-stack,
+.confirmation-card,
+.confirmation-address {
+  display: grid;
+}
+
+.page-intro {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 1.5rem;
+  align-items: end;
+  margin-bottom: 1.2rem;
+}
+
+.page-intro h1 {
+  margin: 0;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.page-intro p:last-child {
+  margin: 0.45rem 0 0;
+  max-width: 62ch;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.page-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: flex-end;
+}
+
+.page-split,
+.payment-layout {
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.payment-main-stack,
+.side-panel-stack,
+.confirmation-card {
+  gap: 1rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.2rem;
+}
+
+.details-grid div {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.details-grid span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.details-grid strong {
+  font-size: 1rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.accent-panel {
+  gap: 0.2rem;
+}
+
+.confirmation-card {
+  align-content: start;
+}
+
+.confirmation-badge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  background: rgba(46, 93, 71, 0.12);
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.confirmation-address {
+  gap: 0.28rem;
+  padding-top: 0.25rem;
+}
+
+.confirmation-address p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .page-intro,
+  .page-split,
+  .payment-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page-intro-actions {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 640px) {
   .page-content {
     width: calc(100% - 1rem);
     padding: 1rem 0 1.8rem;
+  }
+
+  .page-intro {
+    margin-bottom: 1rem;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
   }
 }

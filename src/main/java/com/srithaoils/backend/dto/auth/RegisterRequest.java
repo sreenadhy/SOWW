@@ -1,6 +1,7 @@
 package com.srithaoils.backend.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -12,6 +13,9 @@ public record RegisterRequest(
         String secondaryPhoneNumber,
         @NotBlank(message = "Name is required")
         @Size(max = 120, message = "Name can be at most 120 characters")
-        String name
+        String name,
+        @Email(message = "Email must be valid")
+        @Size(max = 160, message = "Email can be at most 160 characters")
+        String email
 ) {
 }

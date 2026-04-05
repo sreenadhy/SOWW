@@ -2,14 +2,9 @@ import '../styles/payment-methods.css';
 
 const paymentOptions = [
   {
-    id: 'upi',
-    title: 'UPI',
-    description: 'Quick mobile payment with a verification step before order placement.',
-  },
-  {
-    id: 'card',
-    title: 'Credit / Debit Card',
-    description: 'Mock card handoff for now. Keeps the flow ready for a real gateway later.',
+    id: 'online',
+    title: 'Online Payment',
+    description: 'Ready for payment gateway integration with card, UPI, or netbanking later.',
   },
   {
     id: 'cod',

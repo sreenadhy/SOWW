@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OrderSummaryCard from '../components/OrderSummaryCard';
 import PageIntro from '../components/PageIntro';
@@ -8,15 +9,11 @@ import { ROUTES } from '../utils/routes';
 import { isShippingFormComplete } from '../utils/storefront';
 
 function formatPaymentLabel(paymentMethod) {
-  if (paymentMethod === 'card') {
-    return 'Card';
-  }
-
   if (paymentMethod === 'cod') {
     return 'Cash on Delivery';
   }
 
-  return 'UPI';
+  return 'Online Payment';
 }
 
 export default function PaymentPage() {
@@ -34,15 +31,24 @@ export default function PaymentPage() {
     setPaymentMethod,
     handleLogout,
     placeOrder,
+    clearOrderError,
   } = useStorefront();
 
   const shippingReady = isShippingFormComplete(shippingForm);
 
-  async function handlePlaceOrder() {
-    const order = await placeOrder();
+  useEffect(() => {
+    clearOrderError();
+  }, []);
 
-    if (order) {
-      navigate(ROUTES.confirmation);
+  async function handlePlaceOrder() {
+    try {
+      const order = await placeOrder();
+
+      if (order) {
+        navigate(ROUTES.confirmation);
+      }
+    } catch {
+      // Order errors are surfaced via shared order state.
     }
   }
 
@@ -51,7 +57,7 @@ export default function PaymentPage() {
       <PageIntro
         eyebrow="Payment"
         title="Verify and place the order"
-        description="Choose a mock payment method, complete OTP verification, and submit the order to the backend."
+        description="Review your selected payment method, shipping snapshot, and submit the order to the backend."
         actions={(
           <>
             <Link className="secondary-button" to={ROUTES.checkout}>
@@ -90,7 +96,12 @@ export default function PaymentPage() {
             </div>
           ) : null}
 
-          {orderState.error ? <p className="form-error">{orderState.error}</p> : null}
+          {orderState.error ? (
+            <div className="state-card error">
+              <p className="callout-title">Unable to place order</p>
+              <p>{orderState.error}</p>
+            </div>
+          ) : null}
         </div>
 
         <div className="side-panel-stack">

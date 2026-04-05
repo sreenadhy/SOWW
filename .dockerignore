@@ -1,0 +1,12 @@
+target
+.git
+.idea
+.m2
+.tools
+.npm-cache
+frontend
+node_modules
+*.log
+*.err
+dist
+docs

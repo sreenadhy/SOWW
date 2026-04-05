@@ -1,7 +1,6 @@
 const STORAGE_KEYS = {
   session: 'sritha-oils-auth',
   cart: 'sritha-oils-cart',
-  mockUsers: 'sritha-oils-users',
   shipping: 'sritha-oils-shipping',
   payment: 'sritha-oils-payment',
   lastOrder: 'sritha-oils-last-order',
@@ -47,14 +46,6 @@ export function loadCart() {
 
 export function saveCart(cart) {
   writeStoredJson(STORAGE_KEYS.cart, cart);
-}
-
-export function loadRegisteredUsers(fallbackUsers = []) {
-  return readStoredJson(STORAGE_KEYS.mockUsers, fallbackUsers);
-}
-
-export function saveRegisteredUsers(users) {
-  writeStoredJson(STORAGE_KEYS.mockUsers, users);
 }
 
 export function loadShipping() {

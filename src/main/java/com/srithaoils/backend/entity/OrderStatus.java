@@ -1,7 +1,7 @@
 package com.srithaoils.backend.entity;
 
 public enum OrderStatus {
-    PENDING,
+    CREATED,
     CONFIRMED,
     SHIPPED,
     DELIVERED

@@ -15,7 +15,7 @@ export default function ProtectedRoute({ requireShipping = false }) {
     return (
       <Navigate
         replace
-        to={ROUTES.cart}
+        to={ROUTES.login}
         state={{ authRequired: true, from: location.pathname }}
       />
     );

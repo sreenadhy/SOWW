@@ -28,8 +28,8 @@
 }
 
 .product-artwork--hero {
-  min-height: 280px;
-  height: 100%;
+  min-height: 0;
+  height: clamp(230px, 36vh, 360px);
 }
 
 .product-artwork--mini {
@@ -41,7 +41,7 @@
 
 @media (max-width: 640px) {
   .product-artwork--hero {
-    min-height: 220px;
+    height: 220px;
   }
 
   .product-artwork--mini {

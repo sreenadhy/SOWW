@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: sritha-oils-frontend
+    runtime: static
+    rootDir: frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
+
+  - type: web
+    name: sritha-oils-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/products
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: sritha-oils-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sritha-oils-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sritha-oils-db
+          property: password
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: APP_AUTH_DEV_RETURN_OTP
+        value: "true"
+      - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
+        value: "*"
+
+databases:
+  - name: sritha-oils-db
+    databaseName: sritha_oils_db
+    user: sritha_admin
+    plan: free
+    postgresMajorVersion: "17"

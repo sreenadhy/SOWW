@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false, length = 120)
     private String name;
 
+    @Column(length = 160)
+    private String email;
+
     @Column(nullable = false, length = 30)
     private String role;
 
@@ -40,10 +43,11 @@ public class User {
     public User() {
     }
 
-    public User(String primaryPhoneNumber, String secondaryPhoneNumber, String name) {
+    public User(String primaryPhoneNumber, String secondaryPhoneNumber, String name, String email) {
         this.primaryPhoneNumber = primaryPhoneNumber;
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.name = name;
+        this.email = email;
         this.role = DEFAULT_ROLE;
     }
 
@@ -88,6 +92,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getRole() {

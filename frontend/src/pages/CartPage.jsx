@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import QuantityControl from '../components/QuantityControl';
 import useStorefront from '../hooks/useStorefront';
 import { getOrganicProductContent } from '../utils/productContent';
@@ -6,6 +6,7 @@ import { ROUTES } from '../utils/routes';
 import '../styles/cart-page.css';
 
 export default function CartPage() {
+  const navigate = useNavigate();
   const { cartItems, totalAmount, formatCurrency, updateCart, removeFromCart } = useStorefront();
 
   return (
@@ -66,13 +67,17 @@ export default function CartPage() {
             })}
           </div>
 
-          <aside className="cart-summary">
-            <p className="section-kicker">Order Total</p>
-            <h2>{formatCurrency(totalAmount)}</h2>
-            <button type="button" className="primary-button panel-button">
-              Proceed to Checkout
-            </button>
-          </aside>
+           <aside className="cart-summary">
+             <p className="section-kicker">Order Total</p>
+             <h2>{formatCurrency(totalAmount)}</h2>
+             <button
+               type="button"
+               className="primary-button panel-button"
+               onClick={() => navigate(ROUTES.checkout)}
+             >
+               Proceed to Checkout
+             </button>
+           </aside>
         </div>
       )}
     </section>

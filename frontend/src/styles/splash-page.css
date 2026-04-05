@@ -1,11 +1,28 @@
 .splash-shell {
+  position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 1.5rem;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(18, 41, 28, 0.48), rgba(89, 72, 18, 0.28)),
+    var(--splash-image) center / cover no-repeat;
+}
+
+.splash-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 246, 206, 0.34), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(18, 41, 28, 0.18));
+  pointer-events: none;
 }
 
 .splash-panel {
+  position: relative;
+  z-index: 1;
   width: min(100%, 560px);
   padding: 2.3rem;
   border-radius: 32px;

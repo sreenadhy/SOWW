@@ -1,0 +1,48 @@
+
+> sritha-oils-frontend@0.0.1 dev
+> vite
+
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+Port 5175 is in use, trying another one...
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m1484[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5176[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.1.5:[1m5176[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m2:16:25 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/context/StorefrontContext.jsx[22m
+[2m2:16:27 PM[22m [36m[1m[vite][22m[39m [33mhmr invalidate [39m[2m/src/context/StorefrontContext.jsx[22m Could not Fast Refresh ("useStorefront" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m2:16:27 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/context/StorefrontContext.jsx[22m
+[2m2:16:38 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:20:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/context/StorefrontContext.jsx[22m
+[2m2:20:50 PM[22m [36m[1m[vite][22m[39m [33mhmr invalidate [39m[2m/src/context/StorefrontContext.jsx[22m Could not Fast Refresh ("useStorefront" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m2:20:50 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/context/StorefrontContext.jsx[22m
+[2m2:21:08 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m2:21:18 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/product-artwork.css[22m
+[2m2:35:11 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:35:23 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m2:35:33 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/context/StorefrontContext.jsx[22m
+[2m2:35:33 PM[22m [36m[1m[vite][22m[39m [33mhmr invalidate [39m[2m/src/context/StorefrontContext.jsx[22m Could not Fast Refresh ("useStorefront" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m2:35:33 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/context/StorefrontContext.jsx[22m
+[2m2:35:42 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/context/StorefrontContext.jsx[22m
+[2m2:35:42 PM[22m [36m[1m[vite][22m[39m [33mhmr invalidate [39m[2m/src/context/StorefrontContext.jsx[22m Could not Fast Refresh ("useStorefront" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m2:35:42 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/context/StorefrontContext.jsx[22m
+[2m2:35:56 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/PaymentPage.jsx[22m
+[2m2:36:11 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/PaymentPage.jsx[22m
+[2m2:36:33 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:47:50 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/app.css[22m
+[2m2:48:02 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/session-status.css[22m
+[2m2:48:12 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/PaymentPage.jsx[22m
+[2m2:49:43 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:49:52 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m2:55:04 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:55:04 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.jsx[22m
+[2m2:55:16 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m2:55:29 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/SplashPage.jsx[22m
+[2m2:55:47 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/splash-page.css[22m
+[2m2:59:18 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m3:04:13 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m3:05:46 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m3:09:35 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m
+[2m1:46:54 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/login-page.css[22m

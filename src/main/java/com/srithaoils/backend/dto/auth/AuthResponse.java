@@ -9,6 +9,7 @@ public record AuthResponse(
         Long userId,
         String phoneNumber,
         boolean registered,
-        String name
+        String name,
+        String email
 ) {
 }

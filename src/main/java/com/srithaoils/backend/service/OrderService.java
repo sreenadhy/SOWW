@@ -4,13 +4,19 @@ import com.srithaoils.backend.dto.address.AddressResponse;
 import com.srithaoils.backend.dto.order.CartItemRequest;
 import com.srithaoils.backend.dto.order.CreateOrderRequest;
 import com.srithaoils.backend.dto.order.CreateOrderResponse;
+import com.srithaoils.backend.dto.order.OrderAddressRequest;
 import com.srithaoils.backend.dto.order.OrderItemResponse;
 import com.srithaoils.backend.dto.order.OrderSummaryResponse;
 import com.srithaoils.backend.dto.order.OrderTrackingResponse;
+import com.srithaoils.backend.dto.order.UpdateOrderStatusRequest;
+import com.srithaoils.backend.dto.payment.PaymentResponse;
 import com.srithaoils.backend.entity.Address;
 import com.srithaoils.backend.entity.Order;
 import com.srithaoils.backend.entity.OrderItem;
 import com.srithaoils.backend.entity.OrderStatus;
+import com.srithaoils.backend.entity.Payment;
+import com.srithaoils.backend.entity.PaymentMethod;
+import com.srithaoils.backend.entity.PaymentStatus;
 import com.srithaoils.backend.entity.OrderTracking;
 import com.srithaoils.backend.entity.OrderTrackingStatus;
 import com.srithaoils.backend.entity.Product;
@@ -39,6 +45,7 @@ public class OrderService {
 
     private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("1000.00");
     private static final BigDecimal STANDARD_SHIPPING_FEE = new BigDecimal("60.00");
+    private static final int ESTIMATED_DELIVERY_DAYS = 4;
 
     private final OrderRepository orderRepository;
     private final OrderTrackingRepository orderTrackingRepository;
@@ -64,8 +71,7 @@ public class OrderService {
         User user = userRepository.findByPrimaryPhoneNumber(primaryPhoneNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
 
-        Address address = addressRepository.findByIdAndUserId(request.addressId(), user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found for this user"));
+        Address address = resolveAddress(user, request.addressId(), request.address());
 
         Map<Long, Integer> mergedQuantities = mergeQuantities(request.items());
         List<Product> products = productRepository.findAllById(mergedQuantities.keySet());
@@ -80,7 +86,7 @@ public class OrderService {
         order.setOrderNumber(generateOrderNumber());
         order.setUser(user);
         order.setAddress(address);
-        order.setOrderStatus(OrderStatus.PENDING);
+        order.setOrderStatus(OrderStatus.CREATED);
 
         BigDecimal subtotal = BigDecimal.ZERO;
         for (Map.Entry<Long, Integer> entry : mergedQuantities.entrySet()) {
@@ -112,6 +118,12 @@ public class OrderService {
         order.setShippingFee(shippingFee);
         order.setTotalAmount(totalAmount);
 
+        Payment payment = new Payment();
+        payment.setPaymentMethod(request.paymentMethod());
+        payment.setPaymentStatus(resolvePaymentStatus(request.paymentMethod()));
+        payment.setPaymentDetails(request.paymentDetails());
+        order.setPayment(payment);
+
         OrderTracking placedTracking = new OrderTracking();
         placedTracking.setStatus(OrderTrackingStatus.PLACED);
         placedTracking.setRemarks("Order placed successfully");
@@ -123,10 +135,13 @@ public class OrderService {
                 savedOrder.getId(),
                 savedOrder.getOrderNumber(),
                 savedOrder.getOrderStatus(),
+                mapAddress(savedOrder.getAddress()),
+                mapPayment(savedOrder.getPayment()),
                 savedOrder.getSubtotal(),
                 savedOrder.getShippingFee(),
                 savedOrder.getTotalAmount(),
-                savedOrder.getCreatedAt()
+                savedOrder.getCreatedAt(),
+                savedOrder.getCreatedAt().toLocalDate().plusDays(ESTIMATED_DELIVERY_DAYS)
         );
     }
 
@@ -160,6 +175,23 @@ public class OrderService {
                 .toList();
     }
 
+    @Transactional
+    public OrderSummaryResponse updateOrderStatus(Long orderId, UpdateOrderStatusRequest request) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        order.setOrderStatus(request.orderStatus());
+
+        OrderTracking tracking = new OrderTracking();
+        tracking.setStatus(mapTrackingStatus(request.orderStatus()));
+        tracking.setRemarks(request.remarks() == null || request.remarks().isBlank()
+                ? "Order status updated to " + request.orderStatus().name()
+                : request.remarks().trim());
+        order.addTrackingUpdate(tracking);
+
+        return mapOrderSummary(orderRepository.save(order));
+    }
+
     private Map<Long, Integer> mergeQuantities(List<CartItemRequest> items) {
         Map<Long, Integer> merged = new LinkedHashMap<>();
         for (CartItemRequest item : items) {
@@ -169,19 +201,6 @@ public class OrderService {
     }
 
     private OrderSummaryResponse mapOrderSummary(Order order) {
-        Address address = order.getAddress();
-
-        AddressResponse addressResponse = new AddressResponse(
-                address.getId(),
-                address.getUser().getId(),
-                address.getFullAddress(),
-                address.getCity(),
-                address.getState(),
-                address.getPincode(),
-                Boolean.TRUE.equals(address.getIsDefault()),
-                address.getCreatedAt()
-        );
-
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> new OrderItemResponse(
                         item.getId(),
@@ -197,13 +216,77 @@ public class OrderService {
                 order.getId(),
                 order.getOrderNumber(),
                 order.getOrderStatus(),
-                addressResponse,
+                mapAddress(order.getAddress()),
+                mapPayment(order.getPayment()),
                 items,
                 order.getSubtotal(),
                 order.getShippingFee(),
                 order.getTotalAmount(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                order.getCreatedAt().toLocalDate().plusDays(ESTIMATED_DELIVERY_DAYS)
         );
+    }
+
+    private Address resolveAddress(User user, Long addressId, OrderAddressRequest addressRequest) {
+        if (addressId != null) {
+            return addressRepository.findByIdAndUserId(addressId, user.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Address not found for this user"));
+        }
+
+        if (addressRequest == null) {
+            throw new IllegalArgumentException("Address details are required when no saved address is selected");
+        }
+
+        List<Address> existingAddresses = addressRepository.findAllByUserIdOrderByIsDefaultDescCreatedAtDesc(user.getId());
+        boolean shouldBeDefault = Boolean.TRUE.equals(addressRequest.saveAsDefault()) || existingAddresses.isEmpty();
+
+        if (shouldBeDefault) {
+            existingAddresses.forEach(existingAddress -> existingAddress.setIsDefault(Boolean.FALSE));
+        }
+
+        Address address = new Address();
+        address.setUser(user);
+        address.setFullAddress(addressRequest.addressLine().trim());
+        address.setCity(addressRequest.city().trim());
+        address.setState(addressRequest.state().trim());
+        address.setPincode(addressRequest.pincode().trim());
+        address.setIsDefault(shouldBeDefault);
+        return addressRepository.save(address);
+    }
+
+    private AddressResponse mapAddress(Address address) {
+        return new AddressResponse(
+                address.getId(),
+                address.getUser().getId(),
+                address.getFullAddress(),
+                address.getCity(),
+                address.getState(),
+                address.getPincode(),
+                Boolean.TRUE.equals(address.getIsDefault()),
+                address.getCreatedAt()
+        );
+    }
+
+    private PaymentResponse mapPayment(Payment payment) {
+        return new PaymentResponse(
+                payment.getId(),
+                payment.getPaymentMethod(),
+                payment.getPaymentStatus(),
+                payment.getPaymentDetails()
+        );
+    }
+
+    private PaymentStatus resolvePaymentStatus(PaymentMethod paymentMethod) {
+        return paymentMethod == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.COMPLETED;
+    }
+
+    private OrderTrackingStatus mapTrackingStatus(OrderStatus orderStatus) {
+        return switch (orderStatus) {
+            case CREATED -> OrderTrackingStatus.PLACED;
+            case CONFIRMED -> OrderTrackingStatus.PACKED;
+            case SHIPPED -> OrderTrackingStatus.SHIPPED;
+            case DELIVERED -> OrderTrackingStatus.DELIVERED;
+        };
     }
 
     private String generateOrderNumber() {
