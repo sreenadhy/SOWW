@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,11 +17,10 @@ public class DataInitializer {
     @Bean
     ApplicationRunner seedProducts(ProductRepository productRepository) {
         return args -> {
-            if (productRepository.count() > 0) {
-                return;
-            }
+            List<Product> productsToAdd = new ArrayList<>();
 
-            List<Product> products = List.of(
+            // Define all products
+            List<Product> allProducts = List.of(
                     new Product(
                             "Cold Pressed Coconut Oil",
                             "Traditional wood-pressed coconut oil with a clean aroma and smooth finish.",
@@ -60,10 +60,27 @@ public class DataInitializer {
                             "/images/products/mustard-oil.jpg",
                             35,
                             "1L"
+                    ),
+                    new Product(
+                            "Castor Oil",
+                            "Pure castor oil extracted from castor beans, known for its medicinal and industrial uses.",
+                            randomPrice(),
+                            "/images/products/castor-oil.jpg",
+                            30,
+                            "1L"
                     )
             );
 
-            productRepository.saveAll(products);
+            // Check and add missing products
+            for (Product product : allProducts) {
+                if (!productRepository.existsByName(product.getName())) {
+                    productsToAdd.add(product);
+                }
+            }
+
+            if (!productsToAdd.isEmpty()) {
+                productRepository.saveAll(productsToAdd);
+            }
         };
     }
 

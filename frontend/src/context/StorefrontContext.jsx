@@ -31,9 +31,11 @@ import {
   validateShippingForm,
 } from '../utils/storefront';
 import coconutImg from '../assets/Cco.png';
-import sunflowerImg from '../assets/All.png';
+import sunflowerImg from '../assets/Sunflower.png';
+import sesameImg from '../assets/Sunfloer.png';
+import mustardImg from '../assets/Mustered.png';
 import castorImg from '../assets/Castor_Oil.png';
-import groundnutImg from '../assets/Groundnut_Oil.png';
+import groundnutImg from '../assets/grounndnut.png';
 
 const StorefrontContext = createContext(null);
 
@@ -173,6 +175,8 @@ export function StorefrontProvider({ children }) {
         let image = '';
         if (name.includes('coconut')) image = coconutImg;
         else if (name.includes('sunflower')) image = sunflowerImg;
+        else if (name.includes('sesame')) image = sesameImg;
+        else if (name.includes('mustard')) image = mustardImg;
         else if (name.includes('castor')) image = castorImg;
         else if (name.includes('groundnut')) image = groundnutImg;
         return { ...product, image };
