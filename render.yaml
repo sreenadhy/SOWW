@@ -47,4 +47,5 @@ databases:
     databaseName: sritha_oils_db
     user: sritha_admin
     plan: free
+    region: singapore
     postgresMajorVersion: "17"
