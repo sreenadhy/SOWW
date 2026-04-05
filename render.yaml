@@ -5,7 +5,7 @@ services:
     rootDir: frontend
     plan: free
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./frontend/dist
     routes:
       - type: rewrite
         source: /*
