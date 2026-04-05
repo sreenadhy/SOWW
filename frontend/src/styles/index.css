@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
+
 :root {
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   color: #1d2f28;
   background:
     radial-gradient(circle at top left, rgba(255, 222, 173, 0.38), transparent 28%),
     radial-gradient(circle at top right, rgba(97, 136, 113, 0.14), transparent 26%),
     linear-gradient(180deg, #f7f1e7 0%, #f4efe8 38%, #eff3ec 100%);
-  --page-max-width: 1220px;
+  --page-max-width: 1200px;
   --surface: rgba(255, 252, 246, 0.82);
   --surface-strong: #fffdf9;
   --surface-contrast: #153527;
@@ -87,13 +89,14 @@ img {
 
 .primary-button,
 .secondary-button {
-  border-radius: 999px;
+  border-radius: 14px;
   border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.9rem 1.25rem;
+  min-height: 3rem;
+  padding: 0.85rem 1.2rem;
   font-weight: 700;
 }
 
@@ -183,7 +186,8 @@ img {
   gap: 0.45rem;
 }
 
-.field-group span {
+.field-group > span:first-child,
+.field-label {
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--muted);

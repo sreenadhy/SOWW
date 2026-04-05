@@ -36,6 +36,7 @@ export default function CartPage() {
 
               return (
                 <article className="cart-row" key={item.id}>
+                  <div className="cart-row-badge">In cart</div>
                   <div className="cart-row-copy">
                     <div className="cart-row-title">
                       <h2>{productContent.displayName}</h2>
@@ -67,17 +68,21 @@ export default function CartPage() {
             })}
           </div>
 
-           <aside className="cart-summary">
-             <p className="section-kicker">Order Total</p>
-             <h2>{formatCurrency(totalAmount)}</h2>
-             <button
-               type="button"
-               className="primary-button panel-button"
-               onClick={() => navigate(ROUTES.checkout)}
-             >
-               Proceed to Checkout
-             </button>
-           </aside>
+          <aside className="cart-summary">
+            <p className="section-kicker">Order Total</p>
+            <h2>{formatCurrency(totalAmount)}</h2>
+            <p className="cart-summary-note">
+              Review your items, keep quantities updated, and continue when you are ready for
+              shipping and payment.
+            </p>
+            <button
+              type="button"
+              className="primary-button panel-button"
+              onClick={() => navigate(ROUTES.checkout)}
+            >
+              Proceed to Checkout
+            </button>
+          </aside>
         </div>
       )}
     </section>

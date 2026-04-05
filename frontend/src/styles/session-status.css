@@ -7,11 +7,12 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
-  gap: 0.9rem;
-  padding: 1rem 1.05rem;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
   border-radius: 20px;
-  background: rgba(51, 116, 77, 0.09);
-  border: 1px solid rgba(51, 116, 77, 0.14);
+  background:
+    linear-gradient(145deg, rgba(233, 249, 240, 0.95), rgba(247, 255, 251, 0.9));
+  border: 1px solid rgba(51, 116, 77, 0.16);
 }
 
 .success-dot {

@@ -42,8 +42,8 @@ export default function CheckoutPage() {
     <>
       <PageIntro
         eyebrow="Checkout"
-        title="Enter shipping details"
-        description="Confirm the delivery address and contact information that should travel with this order."
+        title="Review delivery and payment details"
+        description="Choose the right address, confirm your contact information, and lock in the payment method for this order."
         actions={(
           <>
             <Link className="secondary-button" to={ROUTES.cart}>

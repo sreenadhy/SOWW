@@ -1,6 +1,6 @@
 .cart-page {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 .cart-page-header {
@@ -12,14 +12,15 @@
 
 .cart-page-header h1 {
   margin: 0;
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: clamp(2rem, 3vw, 3rem);
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1.08;
 }
 
 .cart-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.85fr);
+  gap: 1.25rem;
   align-items: start;
 }
 
@@ -31,11 +32,24 @@
 .cart-row {
   display: grid;
   gap: 1rem;
-  padding: 1.1rem;
+  padding: 1.25rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(250, 253, 250, 0.88));
   border: 1px solid rgba(32, 49, 41, 0.08);
   box-shadow: var(--shadow-soft);
+}
+
+.cart-row-badge {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  background: rgba(46, 93, 71, 0.1);
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .cart-row-title {
@@ -51,13 +65,14 @@
 }
 
 .cart-row-title h2 {
-  font-size: 1.05rem;
+  font-size: 1.12rem;
+  line-height: 1.35;
 }
 
 .cart-row-copy p {
   margin-top: 0.45rem;
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .cart-row-meta {
@@ -72,19 +87,34 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(32, 49, 41, 0.07);
 }
 
 .cart-summary {
-  padding: 1.2rem;
+  position: sticky;
+  top: 6.1rem;
+  display: grid;
+  gap: 0.95rem;
+  padding: 1.35rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.86);
+  background:
+    linear-gradient(145deg, rgba(255, 248, 236, 0.98), rgba(243, 249, 243, 0.92));
   border: 1px solid rgba(32, 49, 41, 0.08);
   box-shadow: var(--shadow-soft);
 }
 
 .cart-summary h2 {
-  margin: 0 0 1rem;
-  font-size: 2rem;
+  margin: 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.cart-summary-note {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .cart-empty {
@@ -96,6 +126,10 @@
 @media (max-width: 900px) {
   .cart-layout {
     grid-template-columns: 1fr;
+  }
+
+  .cart-summary {
+    position: static;
   }
 }
 

@@ -1,7 +1,7 @@
 .shipping-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
 .full-span {
@@ -10,7 +10,7 @@
 
 .field-error {
   color: #9f3d2d;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
 }
 

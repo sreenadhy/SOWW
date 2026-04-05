@@ -3,8 +3,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+  min-height: 3rem;
   padding: 0.72rem 0.95rem;
-  border-radius: 999px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(32, 49, 41, 0.08);
   color: var(--brand-strong);
@@ -24,15 +25,16 @@
 }
 
 .cart-badge {
-  min-width: 1.45rem;
-  height: 1.45rem;
-  padding: 0 0.35rem;
+  min-width: 1.55rem;
+  height: 1.55rem;
+  padding: 0 0.4rem;
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), #b56d1a);
+  background: linear-gradient(135deg, var(--brand), #173b2a);
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  box-shadow: 0 10px 18px rgba(46, 93, 71, 0.24);
 }
 
 @media (max-width: 640px) {

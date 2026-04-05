@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import InlineSpinner from '../components/InlineSpinner';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import OtpInputField from '../components/OtpInputField';
@@ -8,6 +8,10 @@ import useStorefront from '../hooks/useStorefront';
 import { isValidOtp, isValidPhoneNumber, normalizeOtp, normalizePhoneNumber } from '../utils/auth';
 import { ROUTES } from '../utils/routes';
 import '../styles/login-page.css';
+
+function isValidEmail(email = '') {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+}
 
 function StageIndicator({ activeStage }) {
   const steps = [
@@ -63,6 +67,13 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [now, setNow] = useState(Date.now());
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [otpTouched, setOtpTouched] = useState(false);
+  const [registerTouched, setRegisterTouched] = useState({
+    name: false,
+    email: false,
+  });
+  const autoSubmittedOtp = useRef('');
   const redirectPath = location.state?.from || ROUTES.home;
 
   useEffect(() => {
@@ -95,22 +106,64 @@ export default function LoginPage() {
     () => Math.max(0, Math.ceil((authCooldownEndsAt - now) / 1000)),
     [authCooldownEndsAt, now],
   );
+  const phoneFieldError =
+    phoneTouched && !isValidPhoneNumber(phoneNumber)
+      ? 'Enter a valid 10-digit mobile number'
+      : '';
+  const otpFieldError =
+    otpTouched && !isValidOtp(otp) ? 'Enter the complete 6-digit OTP' : '';
+  const nameFieldError =
+    registerTouched.name && !name.trim() ? 'Enter your full name' : '';
+  const emailFieldError =
+    registerTouched.email && !isValidEmail(email) ? 'Enter a valid email address' : '';
+  const canRequestOtp = isValidPhoneNumber(phoneNumber) && !authLoading;
+  const canVerifyOtp = isValidOtp(otp) && !authLoading;
+  const canRegister = Boolean(name.trim()) && isValidEmail(email) && !authLoading;
+  const stageSummary =
+    authStage === 'otp'
+      ? 'We sent a one-time password to your mobile. Enter it below to continue.'
+      : authStage === 'register'
+        ? 'Your number is verified. Finish your profile to unlock checkout and order tracking.'
+        : 'Use your mobile number for a fast, secure sign-in experience.';
+
+  useEffect(() => {
+    if (authStage !== 'otp') {
+      autoSubmittedOtp.current = '';
+      setOtpTouched(false);
+      return;
+    }
+
+    if (!otp) {
+      autoSubmittedOtp.current = '';
+    }
+  }, [authStage, otp]);
 
   async function handleRequestOtp(event) {
     event.preventDefault();
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
     setPhoneNumber(normalizedPhone);
+    setPhoneTouched(true);
+
+    if (!isValidPhoneNumber(normalizedPhone)) {
+      return;
+    }
 
     try {
       await requestOtp(normalizedPhone);
       setOtp('');
+      setOtpTouched(false);
+      autoSubmittedOtp.current = '';
     } catch {}
   }
 
-  async function handleVerifyOtp(event) {
-    event.preventDefault();
-    const normalizedValue = normalizeOtp(otp);
+  async function handleVerifyOtpValue(nextOtp) {
+    const normalizedValue = normalizeOtp(nextOtp);
     setOtp(normalizedValue);
+    setOtpTouched(true);
+
+    if (!isValidOtp(normalizedValue)) {
+      return;
+    }
 
     try {
       const result = await verifyOtp(normalizedValue);
@@ -118,11 +171,37 @@ export default function LoginPage() {
       if (result.status === 'existing') {
         navigate(redirectPath, { replace: true });
       }
-    } catch {}
+    } catch {
+      autoSubmittedOtp.current = '';
+    }
+  }
+
+  async function handleVerifyOtp(event) {
+    event.preventDefault();
+    await handleVerifyOtpValue(otp);
+  }
+
+  function handleOtpComplete(nextOtp) {
+    const normalizedValue = normalizeOtp(nextOtp);
+
+    if (!isValidOtp(normalizedValue) || authLoading || autoSubmittedOtp.current === normalizedValue) {
+      return;
+    }
+
+    autoSubmittedOtp.current = normalizedValue;
+    void handleVerifyOtpValue(normalizedValue);
   }
 
   async function handleRegister(event) {
     event.preventDefault();
+    setRegisterTouched({
+      name: true,
+      email: true,
+    });
+
+    if (!name.trim() || !isValidEmail(email)) {
+      return;
+    }
 
     try {
       await registerUser({ name, email });
@@ -136,6 +215,13 @@ export default function LoginPage() {
     setOtp('');
     setName('');
     setEmail('');
+    setPhoneTouched(false);
+    setOtpTouched(false);
+    setRegisterTouched({
+      name: false,
+      email: false,
+    });
+    autoSubmittedOtp.current = '';
   }
 
   async function handleResendOtp() {
@@ -148,13 +234,22 @@ export default function LoginPage() {
     <section className="login-page">
       <div className="login-layout">
         <aside className="login-showcase panel-card">
-          <p className="eyebrow">Simple account flow</p>
-          <h1 className="login-showcase-title">
-            <span>Login with OTP and continue shopping</span>
-          </h1>
-          <p className="login-showcase-text">
-            Secure mobile verification with a clean sign-in flow.
-          </p>
+          <div className="login-showcase-copy">
+            <p className="eyebrow">Simple account flow</p>
+            <h1 className="login-showcase-title">
+              Faster sign in for your organic oil orders.
+            </h1>
+            <p className="login-showcase-text">
+              Verify your mobile number once and move smoothly from browsing to checkout on any
+              screen size.
+            </p>
+
+            <div className="login-showcase-highlights">
+              <div className="login-highlight-pill">Secure OTP login</div>
+              <div className="login-highlight-pill">Responsive on mobile</div>
+              <div className="login-highlight-pill">Quick cart access</div>
+            </div>
+          </div>
 
           <div className="login-showcase-art">
             <img
@@ -169,7 +264,8 @@ export default function LoginPage() {
           <div className="panel-heading">
             <div>
               <p className="section-kicker">Secure access</p>
-              <h2>Continue with your mobile number</h2>
+              <h2>Login with OTP</h2>
+              <p className="login-panel-subtext">{stageSummary}</p>
             </div>
             <Link className="secondary-button compact" to={ROUTES.home}>
               Back to home
@@ -191,21 +287,24 @@ export default function LoginPage() {
           ) : null}
 
           {authStage === 'phone' ? (
-            <form className="login-stage" onSubmit={handleRequestOtp}>
+            <form className="login-stage login-stage--phone" onSubmit={handleRequestOtp}>
               <PhoneNumberField
                 value={phoneNumber}
-                onChange={(event) => setPhoneNumber(normalizePhoneNumber(event.target.value))}
+                onChange={setPhoneNumber}
                 disabled={authLoading}
+                error={phoneFieldError}
               />
 
-              <p className="login-support-text">
-                Enter your 10-digit mobile number to receive an OTP by SMS.
-              </p>
+              <div className="login-step-card">
+                <span className="login-step-count">Step 1</span>
+                <strong>Enter your mobile number</strong>
+                <p>We’ll send a one-time password to continue securely.</p>
+              </div>
 
               <button
                 type="submit"
                 className="primary-button panel-button"
-                disabled={authLoading || !isValidPhoneNumber(phoneNumber)}
+                disabled={!canRequestOtp}
               >
                 {authLoading ? (
                   <>
@@ -220,10 +319,15 @@ export default function LoginPage() {
           ) : null}
 
           {authStage === 'otp' ? (
-            <form className="login-stage" onSubmit={handleVerifyOtp}>
-              <p className="login-feedback login-feedback-success login-feedback-inline login-otp-note" role="status">
-                {authMessage || 'OTP generated successfully.'} OTP sent to <strong>{authPhoneNumber}</strong>. Enter the 6-digit code.
-              </p>
+            <form className="login-stage login-stage--otp" onSubmit={handleVerifyOtp}>
+              <div className="otp-stage-banner" role="status">
+                <p className="otp-stage-banner-title">
+                  {authMessage || 'OTP generated successfully'}
+                </p>
+                <p>
+                  OTP sent to <strong>{authPhoneNumber}</strong>. Enter the 6-digit code.
+                </p>
+              </div>
 
               {authDevOtp ? (
                 <div className="info-callout login-dev-otp">
@@ -237,8 +341,10 @@ export default function LoginPage() {
 
               <OtpInputField
                 value={otp}
-                onChange={(event) => setOtp(normalizeOtp(event.target.value))}
+                onChange={setOtp}
+                onComplete={handleOtpComplete}
                 disabled={authLoading}
+                error={otpFieldError}
               />
 
               <div className="login-resend-row">
@@ -258,7 +364,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 className="primary-button panel-button"
-                disabled={authLoading || !isValidOtp(otp)}
+                disabled={!canVerifyOtp}
               >
                 {authLoading ? (
                   <>
@@ -273,7 +379,7 @@ export default function LoginPage() {
           ) : null}
 
           {authStage === 'register' ? (
-            <form className="login-stage" onSubmit={handleRegister}>
+            <form className="login-stage login-stage--register" onSubmit={handleRegister}>
               <div className="state-card compact success-panel">
                 <p className="callout-title">Create your account</p>
                 <p>
@@ -289,20 +395,41 @@ export default function LoginPage() {
                   placeholder="Enter your full name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
+                  onBlur={() =>
+                    setRegisterTouched((currentState) => ({ ...currentState, name: true }))
+                  }
                   disabled={authLoading}
                 />
+                {nameFieldError ? (
+                  <span className="field-message field-message-error">{nameFieldError}</span>
+                ) : (
+                  <span className="field-message">
+                    This name will appear in your orders and profile.
+                  </span>
+                )}
               </label>
 
               <label className="field-group">
-                <span>Email</span>
+                <span className="field-label">Email</span>
                 <input
                   type="email"
                   autoComplete="email"
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
+                  onBlur={() =>
+                    setRegisterTouched((currentState) => ({ ...currentState, email: true }))
+                  }
                   disabled={authLoading}
+                  aria-invalid={Boolean(emailFieldError)}
                 />
+                {emailFieldError ? (
+                  <span className="field-message field-message-error">{emailFieldError}</span>
+                ) : (
+                  <span className="field-message">
+                    We’ll use this for order updates and account support.
+                  </span>
+                )}
               </label>
 
               <div className="login-action-row">
@@ -312,7 +439,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   className="primary-button"
-                  disabled={authLoading || !name.trim()}
+                  disabled={!canRegister}
                 >
                   {authLoading ? (
                     <>
