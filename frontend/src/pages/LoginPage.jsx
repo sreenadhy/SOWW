@@ -3,11 +3,13 @@ import InlineSpinner from '../components/InlineSpinner';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import OtpInputField from '../components/OtpInputField';
 import PhoneNumberField from '../components/PhoneNumberField';
+import TotpSetupCard from '../components/TotpSetupCard';
 import organicOilsPoster from '../assets/organic-oils-poster.svg';
 import useStorefront from '../hooks/useStorefront';
 import { isValidOtp, isValidPhoneNumber, normalizeOtp, normalizePhoneNumber } from '../utils/auth';
 import { ROUTES } from '../utils/routes';
 import '../styles/login-page.css';
+import '../styles/totp.css';
 
 function isValidEmail(email = '') {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
@@ -17,6 +19,7 @@ function StageIndicator({ activeStage }) {
   const steps = [
     { id: 'phone', label: 'Phone' },
     { id: 'otp', label: 'OTP' },
+    { id: 'totp-setup', label: 'Setup TOTP' },
     { id: 'register', label: 'Create account' },
   ];
 
@@ -24,10 +27,10 @@ function StageIndicator({ activeStage }) {
     <div className="login-stage-indicator" aria-label="Login steps">
       {steps.map((step) => {
         const isActive = step.id === activeStage;
-        const isComplete =
-          (activeStage === 'otp' || activeStage === 'register') && step.id === 'phone'
-            ? true
-            : activeStage === 'register' && step.id === 'otp';
+        const completedStages = ['phone', 'otp', 'totp-setup', 'register'];
+        const currentIndex = completedStages.indexOf(activeStage);
+        const stepIndex = completedStages.indexOf(step.id);
+        const isComplete = stepIndex < currentIndex;
 
         return (
           <div
@@ -55,10 +58,16 @@ export default function LoginPage() {
     authMessage,
     authDevOtp,
     authCooldownEndsAt,
+    totpSecret,
+    totpQrCodeUri,
+    totpSetupPending,
     isAuthenticated,
     requestOtp,
     resendOtp,
     verifyOtp,
+    setupTotp,
+    completeTotpSetup,
+    verifyTotp,
     registerUser,
     resetAuthFlow,
   } = useStorefront();
@@ -119,12 +128,14 @@ export default function LoginPage() {
   const canRequestOtp = isValidPhoneNumber(phoneNumber) && !authLoading;
   const canVerifyOtp = isValidOtp(otp) && !authLoading;
   const canRegister = Boolean(name.trim()) && isValidEmail(email) && !authLoading;
-  const stageSummary =
-    authStage === 'otp'
-      ? 'We sent a one-time password to your mobile. Enter it below to continue.'
-      : authStage === 'register'
-        ? 'Your number is verified. Finish your profile to unlock checkout and order tracking.'
-        : 'Use your mobile number for a fast, secure sign-in experience.';
+   const stageSummary =
+     authStage === 'otp'
+       ? 'We sent a one-time password to your mobile. Enter it below to continue.'
+       : authStage === 'totp-setup'
+         ? 'Secure your account with Google Authenticator for enhanced security.'
+         : authStage === 'register'
+           ? 'Your number is verified. Finish your profile to unlock checkout and order tracking.'
+           : 'Use your mobile number for a fast, secure sign-in experience.';
 
   useEffect(() => {
     if (authStage !== 'otp') {
@@ -156,25 +167,26 @@ export default function LoginPage() {
     } catch {}
   }
 
-  async function handleVerifyOtpValue(nextOtp) {
-    const normalizedValue = normalizeOtp(nextOtp);
-    setOtp(normalizedValue);
-    setOtpTouched(true);
+   async function handleVerifyOtpValue(nextOtp) {
+     const normalizedValue = normalizeOtp(nextOtp);
+     setOtp(normalizedValue);
+     setOtpTouched(true);
 
-    if (!isValidOtp(normalizedValue)) {
-      return;
-    }
+     if (!isValidOtp(normalizedValue)) {
+       return;
+     }
 
-    try {
-      const result = await verifyOtp(normalizedValue);
+     try {
+       const result = await verifyOtp(normalizedValue);
 
-      if (result.status === 'existing') {
-        navigate(redirectPath, { replace: true });
-      }
-    } catch {
-      autoSubmittedOtp.current = '';
-    }
-  }
+       if (result.status === 'existing') {
+         // Existing user - proceed to TOTP or registration
+         await handleSetupTotp();
+       }
+     } catch {
+       autoSubmittedOtp.current = '';
+     }
+   }
 
   async function handleVerifyOtp(event) {
     event.preventDefault();
@@ -224,13 +236,31 @@ export default function LoginPage() {
     autoSubmittedOtp.current = '';
   }
 
-  async function handleResendOtp() {
-    try {
-      await resendOtp();
-    } catch {}
-  }
+   async function handleResendOtp() {
+     try {
+       await resendOtp();
+     } catch {}
+   }
 
-  return (
+   async function handleSetupTotp() {
+     try {
+       await setupTotp();
+     } catch {}
+   }
+
+   async function handleCompleteTotpSetup(code) {
+     try {
+       await completeTotpSetup(code);
+     } catch {}
+   }
+
+   async function handleVerifyTotpCode(code) {
+     try {
+       await verifyTotp(code);
+     } catch {}
+   }
+
+   return (
     <section className="login-page">
       <div className="login-layout">
         <aside className="login-showcase panel-card">
@@ -375,10 +405,34 @@ export default function LoginPage() {
                   'Verify OTP'
                 )}
               </button>
-            </form>
-          ) : null}
+             </form>
+           ) : null}
 
-          {authStage === 'register' ? (
+           {authStage === 'totp-setup' ? (
+             <div className="login-stage login-stage--totp-setup">
+               <div className="totp-stage-banner" role="status">
+                 <p className="otp-stage-banner-title">
+                   {authMessage || 'Set up Google Authenticator'}
+                 </p>
+                 <p>
+                   Secure your account with two-factor authentication
+                 </p>
+               </div>
+
+               <TotpSetupCard
+                 phoneNumber={authPhoneNumber}
+                 secret={totpSecret}
+                 qrCodeUri={totpQrCodeUri}
+                 onVerifyCode={handleCompleteTotpSetup}
+                 onCancel={handleStartOver}
+                 loading={authLoading}
+                 error={authError}
+                 message={authMessage}
+               />
+             </div>
+           ) : null}
+
+           {authStage === 'register' ? (
             <form className="login-stage login-stage--register" onSubmit={handleRegister}>
               <div className="state-card compact success-panel">
                 <p className="callout-title">Create your account</p>

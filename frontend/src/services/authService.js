@@ -17,6 +17,27 @@ export function verifyOtpCode(phoneNumber, otp) {
   });
 }
 
+export function initiateTotpSetup(phoneNumber) {
+  return request('/api/auth/totp/setup/initiate', {
+    method: 'POST',
+    body: JSON.stringify({ phoneNumber }),
+  });
+}
+
+export function verifyTotpSetup(phoneNumber, code) {
+  return request('/api/auth/totp/setup/verify', {
+    method: 'POST',
+    body: JSON.stringify({ phoneNumber, code }),
+  });
+}
+
+export function verifyTotpCode(phoneNumber, code) {
+  return request('/api/auth/verify-totp', {
+    method: 'POST',
+    body: JSON.stringify({ phoneNumber, code }),
+  });
+}
+
 export async function registerAccount(payload) {
   const response = await request('/api/auth/register', {
     method: 'POST',

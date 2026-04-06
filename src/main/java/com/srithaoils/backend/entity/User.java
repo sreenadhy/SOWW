@@ -40,6 +40,15 @@ public class User {
 
     private LocalDateTime lastVerifiedAt;
 
+    @Column(length = 255)
+    private String totpSecret;
+
+    @Column(nullable = false)
+    private boolean totpEnabled = false;
+
+    @Column(nullable = false)
+    private boolean totpSetupPending = false;
+
     public User() {
     }
 
@@ -124,5 +133,29 @@ public class User {
 
     public void setLastVerifiedAt(LocalDateTime lastVerifiedAt) {
         this.lastVerifiedAt = lastVerifiedAt;
+    }
+
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
+    }
+
+    public boolean isTotpSetupPending() {
+        return totpSetupPending;
+    }
+
+    public void setTotpSetupPending(boolean totpSetupPending) {
+        this.totpSetupPending = totpSetupPending;
     }
 }

@@ -5,6 +5,10 @@ import com.srithaoils.backend.dto.auth.OtpRequestRequest;
 import com.srithaoils.backend.dto.auth.OtpRequestResponse;
 import com.srithaoils.backend.dto.auth.OtpVerifyRequest;
 import com.srithaoils.backend.dto.auth.RegisterRequest;
+import com.srithaoils.backend.dto.auth.TotpSetupRequest;
+import com.srithaoils.backend.dto.auth.TotpSetupResponse;
+import com.srithaoils.backend.dto.auth.TotpSetupVerifyRequest;
+import com.srithaoils.backend.dto.auth.TotpVerifyRequest;
 import com.srithaoils.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -38,5 +42,20 @@ public class AuthController {
     @PostMapping("/verify-otp")
     public AuthResponse verifyOtp(@Valid @RequestBody OtpVerifyRequest request) {
         return authService.verifyOtp(request);
+    }
+
+    @PostMapping("/totp/setup/initiate")
+    public TotpSetupResponse initiateTotpSetup(@Valid @RequestBody TotpSetupRequest request) {
+        return authService.initiateTotpSetup(request);
+    }
+
+    @PostMapping("/totp/setup/verify")
+    public TotpSetupResponse verifyTotpSetup(@Valid @RequestBody TotpSetupVerifyRequest request) {
+        return authService.verifyAndCompleteTotpSetup(request);
+    }
+
+    @PostMapping("/verify-totp")
+    public AuthResponse verifyTotp(@Valid @RequestBody TotpVerifyRequest request) {
+        return authService.verifyTotp(request);
     }
 }

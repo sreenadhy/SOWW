@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { requestOtpCode, registerAccount, verifyOtpCode } from '../services/authService';
+import { requestOtpCode, registerAccount, verifyOtpCode, initiateTotpSetup, verifyTotpSetup, verifyTotpCode } from '../services/authService';
 import { fetchAddresses, updateAddress } from '../services/addressService';
 import { fetchOrders, submitOrder } from '../services/orderService';
 import { fetchProducts } from '../services/productService';
@@ -104,10 +104,13 @@ export function StorefrontProvider({ children }) {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authMessage, setAuthMessage] = useState('');
-  const [authDevOtp, setAuthDevOtp] = useState('');
-  const [authCooldownEndsAt, setAuthCooldownEndsAt] = useState(0);
-  const [authOtpVerified, setAuthOtpVerified] = useState(false);
-  const [shippingForm, setShippingForm] = useState(() => ({
+   const [authDevOtp, setAuthDevOtp] = useState('');
+   const [authCooldownEndsAt, setAuthCooldownEndsAt] = useState(0);
+   const [authOtpVerified, setAuthOtpVerified] = useState(false);
+   const [totpSecret, setTotpSecret] = useState('');
+   const [totpQrCodeUri, setTotpQrCodeUri] = useState('');
+   const [totpSetupPending, setTotpSetupPending] = useState(false);
+   const [shippingForm, setShippingForm] = useState(() => ({
     ...DEFAULT_SHIPPING_FORM,
     ...(loadShipping() || {}),
   }));
@@ -315,16 +318,19 @@ export function StorefrontProvider({ children }) {
     setPaymentMethodState(method);
   }
 
-  function resetAuthFlow() {
-    setAuthStage('phone');
-    setAuthPhoneNumber('');
-    setAuthLoading(false);
-    setAuthError('');
-    setAuthMessage('');
-    setAuthDevOtp('');
-    setAuthCooldownEndsAt(0);
-    setAuthOtpVerified(false);
-  }
+   function resetAuthFlow() {
+     setAuthStage('phone');
+     setAuthPhoneNumber('');
+     setAuthLoading(false);
+     setAuthError('');
+     setAuthMessage('');
+     setAuthDevOtp('');
+     setAuthCooldownEndsAt(0);
+     setAuthOtpVerified(false);
+     setTotpSecret('');
+     setTotpQrCodeUri('');
+     setTotpSetupPending(false);
+   }
 
   async function requestOtp(phoneNumber) {
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
@@ -412,48 +418,139 @@ export function StorefrontProvider({ children }) {
     }
   }
 
-  async function registerUser({ name, email, secondaryPhoneNumber = '' }) {
-    if (!authOtpVerified || !authPhoneNumber) {
-      const message = 'Verify OTP before creating the account.';
-      setAuthError(message);
-      throw new Error(message);
-    }
+   async function registerUser({ name, email, secondaryPhoneNumber = '' }) {
+     if (!authOtpVerified || !authPhoneNumber) {
+       const message = 'Verify OTP before creating the account.';
+       setAuthError(message);
+       throw new Error(message);
+     }
 
-    setAuthLoading(true);
-    setAuthError('');
-    setAuthMessage('');
+     setAuthLoading(true);
+     setAuthError('');
+     setAuthMessage('');
 
-    try {
-      const normalizedSession = await registerAccount({
-        primaryPhoneNumber: authPhoneNumber,
-        secondaryPhoneNumber: normalizePhoneNumber(secondaryPhoneNumber) || null,
-        name: name.trim(),
-        email: email?.trim() || '',
-      });
+     try {
+       const normalizedSession = await registerAccount({
+         primaryPhoneNumber: authPhoneNumber,
+         secondaryPhoneNumber: normalizePhoneNumber(secondaryPhoneNumber) || null,
+         name: name.trim(),
+         email: email?.trim() || '',
+       });
 
-      const nextSession = {
-        accessToken: normalizedSession.accessToken,
-        tokenType: normalizedSession.tokenType,
-        expiresAt: normalizedSession.expiresAt,
-        verifiedAt: normalizedSession.verifiedAt,
-        user: {
-          id: normalizedSession.userId,
-          name: normalizedSession.name,
-          email: normalizedSession.email,
-          phoneNumber: normalizedSession.phoneNumber,
-        },
-      };
+       const nextSession = {
+         accessToken: normalizedSession.accessToken,
+         tokenType: normalizedSession.tokenType,
+         expiresAt: normalizedSession.expiresAt,
+         verifiedAt: normalizedSession.verifiedAt,
+         user: {
+           id: normalizedSession.userId,
+           name: normalizedSession.name,
+           email: normalizedSession.email,
+           phoneNumber: normalizedSession.phoneNumber,
+         },
+       };
 
-      setSession(nextSession);
-      resetAuthFlow();
-      return { status: 'registered', user: nextSession.user };
-    } catch (error) {
-      setAuthError(error.message || 'Unable to create your account right now.');
-      throw error;
-    } finally {
-      setAuthLoading(false);
-    }
-  }
+       setSession(nextSession);
+       resetAuthFlow();
+       return { status: 'registered', user: nextSession.user };
+     } catch (error) {
+       setAuthError(error.message || 'Unable to create your account right now.');
+       throw error;
+     } finally {
+       setAuthLoading(false);
+     }
+   }
+
+   async function setupTotp() {
+     if (!authPhoneNumber) {
+       const message = 'Phone number is required to setup TOTP.';
+       setAuthError(message);
+       throw new Error(message);
+     }
+
+     setAuthLoading(true);
+     setAuthError('');
+     setAuthMessage('');
+
+     try {
+       const response = await initiateTotpSetup(authPhoneNumber);
+       setTotpSecret(response.secret);
+       setTotpQrCodeUri(response.qrCodeUri);
+       setTotpSetupPending(true);
+       setAuthMessage(response.message);
+       return response;
+     } catch (error) {
+       setAuthError(error.message || 'Unable to setup TOTP right now.');
+       throw error;
+     } finally {
+       setAuthLoading(false);
+     }
+   }
+
+   async function completeTotpSetup(code) {
+     if (!authPhoneNumber || !code) {
+       const message = 'Phone number and TOTP code are required.';
+       setAuthError(message);
+       throw new Error(message);
+     }
+
+     setAuthLoading(true);
+     setAuthError('');
+     setAuthMessage('');
+
+     try {
+       const response = await verifyTotpSetup(authPhoneNumber, code);
+       setTotpSetupPending(false);
+       setAuthMessage('TOTP setup completed successfully. You can now login with TOTP.');
+       return response;
+     } catch (error) {
+       setAuthError(error.message || 'Invalid TOTP code. Please try again.');
+       throw error;
+     } finally {
+       setAuthLoading(false);
+     }
+   }
+
+   async function verifyTotp(code) {
+     const normalizedValue = normalizeOtp(code);
+
+     if (!isValidOtp(normalizedValue)) {
+       const message = 'TOTP must be 6 digits';
+       setAuthError(message);
+       throw new Error(message);
+     }
+
+     setAuthLoading(true);
+     setAuthError('');
+     setAuthMessage('');
+
+     try {
+       const response = await verifyTotpCode(authPhoneNumber, normalizedValue);
+
+       const normalizedSession = normalizeAuthSession(response);
+       const nextSession = {
+         accessToken: normalizedSession.accessToken,
+         tokenType: normalizedSession.tokenType,
+         expiresAt: normalizedSession.expiresAt,
+         verifiedAt: normalizedSession.verifiedAt,
+         user: {
+           id: normalizedSession.userId,
+           name: normalizedSession.name,
+           email: normalizedSession.email,
+           phoneNumber: normalizedSession.phoneNumber,
+         },
+       };
+
+       setSession(nextSession);
+       resetAuthFlow();
+       return { status: 'verified', user: nextSession.user };
+     } catch (error) {
+       setAuthError(error.message || 'Unable to verify TOTP right now.');
+       throw error;
+     } finally {
+       setAuthLoading(false);
+     }
+   }
 
   async function updateProfileDetails(payload) {
     if (!session?.accessToken) {
@@ -596,69 +693,75 @@ export function StorefrontProvider({ children }) {
   const currentUser = session?.user || null;
   const isAuthenticated = Boolean(currentUser?.phoneNumber);
 
-  const value = {
-    products,
-    productsLoading,
-    productsError,
-    cart,
-    cartItems,
-    cartCount,
-    subtotal,
-    shippingFee,
-    total,
-    totalAmount: total,
-    formatCurrency,
-    session,
-    sessionReady,
-    currentUser,
-    isAuthenticated,
-    profile,
-    addresses,
-    orders,
-    profileLoading,
-    profileError,
-    authStage,
-    authPhoneNumber,
-    authLoading,
-    authError,
-    authMessage,
-    authDevOtp,
-    authCooldownEndsAt,
-    otpVerified: authOtpVerified,
-    authState: {
-      accessToken: session?.accessToken || null,
-      user: currentUser,
-      isAuthenticated,
-      phoneNumber: currentUser?.phoneNumber || '',
-      name: currentUser?.name || '',
-    },
-    shippingForm,
-    paymentMethod,
-    selectedAddressId,
-    useSavedAddress,
-    orderState,
-    lastOrder,
-    loadProducts,
-    refreshAccountData,
-    updateCart,
-    removeFromCart,
-    requestOtp,
-    resendOtp,
-    verifyOtp,
-    registerUser,
-    resetAuthFlow,
-    logout,
-    updateProfileDetails,
-    updateSavedAddress,
-    updateShippingValue,
-    selectAddress,
-    startNewAddress,
-    setPaymentMethod,
-    placeOrder,
-    clearOrderError,
-    clearLastOrder,
-    handleLogout: logout,
-  };
+   const value = {
+     products,
+     productsLoading,
+     productsError,
+     cart,
+     cartItems,
+     cartCount,
+     subtotal,
+     shippingFee,
+     total,
+     totalAmount: total,
+     formatCurrency,
+     session,
+     sessionReady,
+     currentUser,
+     isAuthenticated,
+     profile,
+     addresses,
+     orders,
+     profileLoading,
+     profileError,
+     authStage,
+     authPhoneNumber,
+     authLoading,
+     authError,
+     authMessage,
+     authDevOtp,
+     authCooldownEndsAt,
+     otpVerified: authOtpVerified,
+     totpSecret,
+     totpQrCodeUri,
+     totpSetupPending,
+     authState: {
+       accessToken: session?.accessToken || null,
+       user: currentUser,
+       isAuthenticated,
+       phoneNumber: currentUser?.phoneNumber || '',
+       name: currentUser?.name || '',
+     },
+     shippingForm,
+     paymentMethod,
+     selectedAddressId,
+     useSavedAddress,
+     orderState,
+     lastOrder,
+     loadProducts,
+     refreshAccountData,
+     updateCart,
+     removeFromCart,
+     requestOtp,
+     resendOtp,
+     verifyOtp,
+     setupTotp,
+     completeTotpSetup,
+     verifyTotp,
+     registerUser,
+     resetAuthFlow,
+     logout,
+     updateProfileDetails,
+     updateSavedAddress,
+     updateShippingValue,
+     selectAddress,
+     startNewAddress,
+     setPaymentMethod,
+     placeOrder,
+     clearOrderError,
+     clearLastOrder,
+     handleLogout: logout,
+   };
 
   return <StorefrontContext.Provider value={value}>{children}</StorefrontContext.Provider>;
 }
