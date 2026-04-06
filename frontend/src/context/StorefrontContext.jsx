@@ -488,8 +488,8 @@ export function StorefrontProvider({ children }) {
    }
 
    async function completeTotpSetup(code) {
-     if (!authPhoneNumber || !code) {
-       const message = 'Phone number and TOTP code are required.';
+     if (!authPhoneNumber || !totpSecret || !code) {
+       const message = 'Phone number, TOTP secret, and code are required.';
        setAuthError(message);
        throw new Error(message);
      }
@@ -499,7 +499,7 @@ export function StorefrontProvider({ children }) {
      setAuthMessage('');
 
      try {
-       const response = await verifyTotpSetup(authPhoneNumber, code);
+       const response = await verifyTotpSetup(authPhoneNumber, totpSecret, code);
        setTotpSetupPending(false);
        setAuthMessage('TOTP setup completed successfully. You can now login with TOTP.');
        return response;

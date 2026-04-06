@@ -24,6 +24,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final OtpStore otpStore;
+    private final SmsService smsService;
     private final TotpService totpService;
     private final JwtService jwtService;
     private final long otpExpiryMinutes;
@@ -32,12 +33,14 @@ public class AuthService {
     public AuthService(
             UserRepository userRepository,
             OtpStore otpStore,
+            SmsService smsService,
             TotpService totpService,
             JwtService jwtService,
             @Value("${app.auth.otp-expiry-minutes}") long otpExpiryMinutes,
             @Value("${app.auth.dev-return-otp}") boolean devReturnOtp) {
         this.userRepository = userRepository;
         this.otpStore = otpStore;
+        this.smsService = smsService;
         this.totpService = totpService;
         this.jwtService = jwtService;
         this.otpExpiryMinutes = otpExpiryMinutes;
@@ -78,6 +81,9 @@ public class AuthService {
                 request.phoneNumber(),
                 Duration.ofMinutes(otpExpiryMinutes)
         );
+
+        // Send OTP via SMS to real phone number
+        smsService.sendOtpSms(request.phoneNumber(), otpDetails.otp());
 
         return new OtpRequestResponse(
                 "OTP generated successfully",
@@ -143,32 +149,28 @@ public class AuthService {
         User user = userRepository.findByPrimaryPhoneNumber(request.phoneNumber())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // For now, we'll temporarily store the secret during setup
-        // In a real scenario, you'd need to pass the secret from the client
-        // This is a simplified approach for demo purposes
-        if (user.isTotpSetupPending() && user.getTotpSecret() != null) {
-            if (totpService.verifyCode(user.getTotpSecret(), request.code())) {
-                user.setTotpEnabled(true);
-                user.setTotpSetupPending(false);
-                userRepository.save(user);
-
-                String qrCodeUri = totpService.generateProvisioningUri(
-                        user.getTotpSecret(),
-                        user.getPrimaryPhoneNumber(),
-                        "Sritha Oils"
-                );
-
-                return new TotpSetupResponse(
-                        user.getTotpSecret(),
-                        qrCodeUri,
-                        "TOTP setup completed successfully"
-                );
-            } else {
-                throw new IllegalArgumentException("Invalid TOTP code");
-            }
+        // Verify the TOTP code using the provided secret
+        if (!totpService.verifyCode(request.secret(), request.code())) {
+            throw new IllegalArgumentException("Invalid TOTP code");
         }
 
-        throw new IllegalArgumentException("TOTP setup not initiated");
+        // Save the secret and enable TOTP for the user
+        user.setTotpSecret(request.secret());
+        user.setTotpEnabled(true);
+        user.setTotpSetupPending(false);
+        userRepository.save(user);
+
+        String qrCodeUri = totpService.generateProvisioningUri(
+                user.getTotpSecret(),
+                user.getPrimaryPhoneNumber(),
+                "Sritha Oils"
+        );
+
+        return new TotpSetupResponse(
+                user.getTotpSecret(),
+                qrCodeUri,
+                "TOTP setup completed successfully"
+        );
     }
 
     @Transactional

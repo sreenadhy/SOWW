@@ -24,10 +24,10 @@ export function initiateTotpSetup(phoneNumber) {
   });
 }
 
-export function verifyTotpSetup(phoneNumber, code) {
+export function verifyTotpSetup(phoneNumber, secret, code) {
   return request('/api/auth/totp/setup/verify', {
     method: 'POST',
-    body: JSON.stringify({ phoneNumber, code }),
+    body: JSON.stringify({ phoneNumber, secret, code }),
   });
 }
 
